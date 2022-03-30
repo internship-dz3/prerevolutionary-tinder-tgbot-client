@@ -1,6 +1,6 @@
 package com.liga.internship.client.service;
 
-import lombok.SneakyThrows;
+
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -61,17 +61,6 @@ public class TextService {
             }
         }
         return text;
-    }
-
-
-    @SneakyThrows
-    public static void main(String[] args) {
-
-        String a = "Красавица, 24 лет, интеллигентная, брюнетка, очень шикарная, прогремевшая в Москве и Париже по красоте и нарядам, ищет знакомств, цель — замужество, с миллионером пожилых лет";
-
-        System.out.println(translateTextIntoSlavOld(a));
-
-
     }
 
 }

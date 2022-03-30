@@ -1,4 +1,4 @@
-package com.liga.internship.client.domain.dto;
+package com.liga.internship.client.domain;
 
 import lombok.*;
 
@@ -8,9 +8,12 @@ import lombok.*;
 @Builder
 @Getter
 @Setter
-public class UserTo {
+public class UserProfile {
     private Long id;
     private String username;
+    private Integer age = 20;
     private String description;
     private String gender;
+    private String speciality;
+    private String look;
 }

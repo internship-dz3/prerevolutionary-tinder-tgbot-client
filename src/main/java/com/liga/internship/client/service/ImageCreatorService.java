@@ -47,13 +47,13 @@ public class ImageCreatorService {
             double expectedWidth = outline.getBounds().getWidth();
             double expectedHeight = outline.getBounds().getHeight();
             boolean textFits = image.getWidth() >= expectedWidth && image.getHeight() >= expectedHeight;
-            if(!textFits) {
+            if (!textFits) {
                 positionX = (image.getWidth() - metrics.stringWidth(text)) / 2;
                 positionY = (image.getHeight() - metrics.getHeight()) / 2 + metrics.getAscent();
-                double widthBasedFontSize = (baseFont.getSize2D()*image.getWidth())/expectedWidth;
-                double heightBasedFontSize = (baseFont.getSize2D()*image.getHeight())/expectedHeight;
+                double widthBasedFontSize = (baseFont.getSize2D() * image.getWidth()) / expectedWidth;
+                double heightBasedFontSize = (baseFont.getSize2D() * image.getHeight()) / expectedHeight;
                 double newFontSize = widthBasedFontSize < heightBasedFontSize ? widthBasedFontSize : heightBasedFontSize;
-                baseFont = baseFont.deriveFont(baseFont.getStyle(), (float)newFontSize);
+                baseFont = baseFont.deriveFont(baseFont.getStyle(), (float) newFontSize);
             }
 
             //рисуем

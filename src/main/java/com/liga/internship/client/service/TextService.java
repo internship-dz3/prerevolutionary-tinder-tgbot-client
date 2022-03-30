@@ -34,7 +34,7 @@ public class TextService {
     }
 
     private String getLastSymbolIfExists(String word) {
-        List<String> symbols = List.of("?", ":", ";", "-", " ");
+        List<String> symbols = List.of("?", ":", ";", "-", " ", "!");
         String lastChar = String.valueOf(word.charAt(word.length() - 1));
         if (symbols.contains(lastChar)) {
             return lastChar;
@@ -55,6 +55,13 @@ public class TextService {
             }
         }
         return text;
+    }
+
+    public static void main(String[] args) {
+        String input = "Привет!";
+
+        TextService textService = new TextService();
+        System.out.println(textService.translateTextIntoSlavOld(input));
     }
 
 }

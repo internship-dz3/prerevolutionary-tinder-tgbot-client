@@ -2,124 +2,93 @@ package com.liga.internship.client.bot.handler;
 
 import com.liga.internship.client.bot.BotState;
 import com.liga.internship.client.cache.UserDataCache;
-import com.liga.internship.client.commons.Constant;
 import com.liga.internship.client.domain.UserProfile;
-import com.liga.internship.client.service.ReplyMessageService;
+import com.liga.internship.client.service.*;
+import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
-import org.telegram.telegrambots.meta.api.objects.CallbackQuery;
+import org.telegram.telegrambots.meta.api.methods.PartialBotApiMethod;
 import org.telegram.telegrambots.meta.api.objects.Message;
-import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
-import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKeyboardButton;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.io.File;
 
-import static com.liga.internship.client.commons.Constant.*;
+import static com.liga.internship.client.bot.BotState.*;
+import static com.liga.internship.client.commons.TextInput.*;
+import static com.liga.internship.client.commons.TextMessage.*;
 
 @Slf4j
 @Component
-public class FillProfileHandler implements InputHandler {
+@AllArgsConstructor
+public class FillProfileHandler implements InputMessageHandler {
     private final ReplyMessageService messageService;
+    private final ProfileService profileService;
     private final UserDataCache userDataCache;
-
-    @Autowired
-    public FillProfileHandler(ReplyMessageService messageService, UserDataCache userDataCache) {
-        this.messageService = messageService;
-        this.userDataCache = userDataCache;
-    }
+    private final ClientRestService clientRestService;
+    private final ImageCreatorService imageCreatorService;
+    private final MainMenuService mainMenuService;
 
     @Override
     public BotState getHandlerName() {
-        return BotState.FILLING_PROFILE;
+        return FILLING_PROFILE_START;
     }
 
     @Override
-    public SendMessage handleCallback(CallbackQuery callback) {
-        return processUserButtonPush(callback);
-    }
-
-    private SendMessage processUserButtonPush(CallbackQuery callback) {
-        String userAnswer = callback.getData();
-        long userId = callback.getFrom().getId();
-        long chatId = callback.getMessage().getChatId();
-        UserProfile userProfile = userDataCache.getUserProfile(userId);
-        BotState botState = userDataCache.getUsersCurrentBotState(userId);
-        SendMessage replyToUser = null;
-        if (botState.equals(BotState.ASK_NAME)) {
-            userProfile.setGender(userAnswer);
-            replyToUser = messageService.getReplyMessage(chatId, MESSAGE_ENTER_YOUR_NAME);
-            userDataCache.setUsersCurrentBotState(userId, BotState.ASK_DESCRIBE);
-        }
-        if (botState.equals(BotState.ASK_LOOK)) {
-            userProfile.setLook(userAnswer);
-            userDataCache.setUsersCurrentBotState(userId, BotState.PROFILE_FILLED);
-        }
-        userDataCache.saveUserProfile(userId, userProfile);
-        return replyToUser;
-    }
-
-    @Override
-    public SendMessage handleMessage(Message message) {
-        if (userDataCache.getUsersCurrentBotState(message.getFrom().getId()).equals(BotState.FILLING_PROFILE)) {
-            userDataCache.setUsersCurrentBotState(message.getFrom().getId(), BotState.ASK_GENDER);
+    public PartialBotApiMethod<?> handleMessage(Message message) {
+        if (userDataCache.getUsersCurrentBotState(message.getFrom().getId()).equals(FILLING_PROFILE_START)) {
+            userDataCache.setUsersCurrentBotState(message.getFrom().getId(), FILLING_PROFILE_ASK_GENDER);
         }
         return processUserInput(message);
     }
 
-    private SendMessage processUserInput(Message message) {
-        String usersAnswer = message.getText();
+    private PartialBotApiMethod<?> processUserInput(Message message) {
+        String userAnswer = message.getText();
         long userId = message.getFrom().getId();
         long chatId = message.getChatId();
         UserProfile userProfile = userDataCache.getUserProfile(userId);
         BotState botState = userDataCache.getUsersCurrentBotState(userId);
-        SendMessage replyToUser = null;
-        if (botState.equals(BotState.ASK_GENDER)) {
-            replyToUser = messageService.getReplyMessage(chatId, Constant.MESSAGE_CHOOSE_YOUR_GENDER);
-            InlineKeyboardMarkup markupInline = getGenderInlineKeyboardMarkup();
-            replyToUser.setReplyMarkup(markupInline);
-            userDataCache.setUsersCurrentBotState(userId, BotState.ASK_NAME);
+        PartialBotApiMethod<?> replyToUser = null;
+
+        if (botState.equals(FILLING_PROFILE_ASK_GENDER)) {
+            userProfile.setTelegramId(userId);
+            String[] buttons = {MALE, FEMALE};
+            replyToUser = profileService.getChooseButtons(chatId, MESSAGE_CHOOSE_YOUR_GENDER, buttons);
+            userDataCache.setUsersCurrentBotState(userId, FILLING_PROFILE_ASK_NAME);
         }
-        if (botState.equals(BotState.ASK_DESCRIBE)) {
-            userProfile.setUsername(usersAnswer);
-            replyToUser = messageService.getReplyMessage(chatId, MESSAGE_LOOKFOR);
-            InlineKeyboardMarkup markupInline = getLookGenderInlineKeyboardMarkup();
-            replyToUser.setReplyMarkup(markupInline);
-            userDataCache.setUsersCurrentBotState(userId, BotState.ASK_LOOK);
+        if (botState.equals(FILLING_PROFILE_ASK_NAME)) {
+            if (userProfile.setGender(userAnswer)) {
+                replyToUser = messageService.getReplyMessage(chatId, MESSAGE_ENTER_YOUR_NAME);
+                userDataCache.setUsersCurrentBotState(userId, FILLING_PROFILE_ASK_DESCRIBE);
+            } else {
+                String[] buttons = {MALE, FEMALE};
+                replyToUser = profileService.getChooseButtons(chatId, MESSAGE_CHOOSE_YOUR_GENDER, buttons);
+                userDataCache.setUsersCurrentBotState(userId, FILLING_PROFILE_ASK_NAME);
+            }
         }
+        if (botState.equals(FILLING_PROFILE_ASK_DESCRIBE)) {
+            userProfile.setUsername(userAnswer);
+            replyToUser = messageService.getReplyMessage(chatId, MESSAGE_DESCRIBE_YOURSELF);
+            userDataCache.setUsersCurrentBotState(userId, FILLING_PROFILE_ASK_LOOK);
+        }
+        if (botState.equals(FILLING_PROFILE_ASK_LOOK)) {
+            userProfile.setDescription(userAnswer);
+            String[] buttons = {MALE, FEMALE, ALL};
+            replyToUser = profileService.getChooseButtons(chatId, MESSAGE_LOOKFOR, buttons);
+            userDataCache.setUsersCurrentBotState(userId, FILLING_PROFILE_COMPLETE);
+        }
+        if (botState.equals(FILLING_PROFILE_COMPLETE)) {
+            if (userProfile.setLook(userAnswer)) {
+                File imageWithTextFile = imageCreatorService.getImageWithTextFile(userProfile, userId);
+                replyToUser = mainMenuService.getMainMenuPhotoMessage(chatId, imageWithTextFile, userProfile.getUsername());
+                clientRestService.registerNewUser(userProfile);
+                userDataCache.setUsersCurrentBotState(userId, SHOW_MAIN_MENU);
+            } else {
+                String[] buttons = {MALE, FEMALE, ALL};
+                replyToUser = profileService.getChooseButtons(chatId, MESSAGE_LOOKFOR, buttons);
+                userDataCache.setUsersCurrentBotState(userId, FILLING_PROFILE_COMPLETE);
+            }
+        }
+
         userDataCache.saveUserProfile(userId, userProfile);
         return replyToUser;
-    }
-
-    private InlineKeyboardMarkup getLookGenderInlineKeyboardMarkup() {
-        InlineKeyboardMarkup markupInline = new InlineKeyboardMarkup();
-        List<List<InlineKeyboardButton>> rowsInline = new ArrayList<>();
-        List<InlineKeyboardButton> inlineKeyboardButtonList = new ArrayList<>();
-        inlineKeyboardButtonList.add(getInlineKeyboardButton(BUTTON_MALE, CALLBACK_MALE));
-        inlineKeyboardButtonList.add(getInlineKeyboardButton(BUTTON_FEMALE, CALLBACK_FEMALE));
-        inlineKeyboardButtonList.add(getInlineKeyboardButton(BUTTON_ALL, CALLBACK_ALL));
-        rowsInline.add(inlineKeyboardButtonList);
-        markupInline.setKeyboard(rowsInline);
-        return markupInline;
-    }
-
-    private InlineKeyboardMarkup getGenderInlineKeyboardMarkup() {
-        InlineKeyboardMarkup markupInline = new InlineKeyboardMarkup();
-        List<List<InlineKeyboardButton>> rowsInline = new ArrayList<>();
-        List<InlineKeyboardButton> inlineKeyboardButtonList = new ArrayList<>();
-        inlineKeyboardButtonList.add(getInlineKeyboardButton(BUTTON_MALE, CALLBACK_MALE));
-        inlineKeyboardButtonList.add(getInlineKeyboardButton(BUTTON_FEMALE, CALLBACK_FEMALE));
-        rowsInline.add(inlineKeyboardButtonList);
-        markupInline.setKeyboard(rowsInline);
-        return markupInline;
-    }
-
-    private InlineKeyboardButton getInlineKeyboardButton(String buttonText, String buttonCommand) {
-        InlineKeyboardButton inlineKeyboardButton = new InlineKeyboardButton();
-        inlineKeyboardButton.setText(buttonText);
-        inlineKeyboardButton.setCallbackData(buttonCommand);
-        return inlineKeyboardButton;
     }
 }

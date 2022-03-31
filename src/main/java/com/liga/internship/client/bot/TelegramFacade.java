@@ -4,11 +4,13 @@ import com.liga.internship.client.cache.UserDataCache;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
-import org.telegram.telegrambots.meta.api.methods.BotApiMethod;
-import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
+import org.telegram.telegrambots.meta.api.methods.PartialBotApiMethod;
 import org.telegram.telegrambots.meta.api.objects.CallbackQuery;
 import org.telegram.telegrambots.meta.api.objects.Message;
 import org.telegram.telegrambots.meta.api.objects.Update;
+
+import static com.liga.internship.client.bot.BotState.*;
+import static com.liga.internship.client.commons.TextInput.*;
 
 @Slf4j
 @Component
@@ -17,26 +19,48 @@ public class TelegramFacade {
     private final BotStateContext botStateContext;
     private final UserDataCache userDataCache;
 
-    public BotApiMethod<?> handleUpdate(Update update) {
-        if (update.hasCallbackQuery()) {
-            CallbackQuery callbackQuery = update.getCallbackQuery();
-            return processCallBackQuery(callbackQuery);
-        }
+    public PartialBotApiMethod<?> handleUpdate(Update update) {
         Message message = update.getMessage();
-        SendMessage sendMessage = null;
+        PartialBotApiMethod<?> sendMessage = null;
         if (message != null && message.hasText()) {
             sendMessage = handleInputMessage(message);
+        }
+
+        if (update.hasCallbackQuery()) {
+            CallbackQuery callbackQuery = update.getCallbackQuery();
+            sendMessage = handleCallbackQuery(callbackQuery);
         }
         return sendMessage;
     }
 
-    private SendMessage handleInputMessage(Message message) {
+    private PartialBotApiMethod<?> handleCallbackQuery(CallbackQuery callbackQuery) {
+        long userId = callbackQuery.getFrom().getId();
+        return botStateContext.processInputCallback(userDataCache.getUsersCurrentBotState(userId), callbackQuery);
+    }
+
+    private PartialBotApiMethod<?> handleInputMessage(Message message) {
         String inputMsg = message.getText();
         long userId = message.getFrom().getId();
         BotState botState;
         switch (inputMsg) {
-            case "/start":
-                botState = BotState.FILLING_PROFILE;
+            case START:
+                botState = LOGIN;
+                break;
+            case CHANGE_PROFILE:
+                botState = FILLING_PROFILE_START;
+                break;
+            case SEARCH:
+                botState = START_VOTING;
+                break;
+            case USERFORM:
+            case SHOW_PROFILE:
+                botState = SHOW_USER_PROFILE;
+                break;
+            case FAVORITES:
+                botState = SHOW_USER_FAVORITES;
+                break;
+            case MAIN_MENU:
+                botState = SHOW_MAIN_MENU;
                 break;
             default:
                 botState = userDataCache.getUsersCurrentBotState(userId);
@@ -44,10 +68,5 @@ public class TelegramFacade {
         }
         userDataCache.setUsersCurrentBotState(userId, botState);
         return botStateContext.processInputMessage(botState, message);
-    }
-
-    private BotApiMethod<?> processCallBackQuery(CallbackQuery callbackQuery) {
-        final long userId = callbackQuery.getFrom().getId();
-        return botStateContext.processCallback(userDataCache.getUsersCurrentBotState(userId), callbackQuery);
     }
 }

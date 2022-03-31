@@ -4,11 +4,16 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
 import org.telegram.telegrambots.meta.api.methods.BotApiMethod;
+import org.telegram.telegrambots.meta.api.methods.PartialBotApiMethod;
+import org.telegram.telegrambots.meta.api.methods.send.SendPhoto;
+import org.telegram.telegrambots.meta.api.methods.updatingmessages.EditMessageMedia;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
+import java.io.Serializable;
+
 @Component
-public class TinderBotV2 extends TelegramLongPollingBot {
+public class TinderTelegramBot extends TelegramLongPollingBot {
     private final TelegramFacade telegramFacade;
 
     @Value("${bot.name}")
@@ -17,7 +22,7 @@ public class TinderBotV2 extends TelegramLongPollingBot {
     @Value("${bot.token}")
     private String botToken;
 
-    public TinderBotV2(TelegramFacade telegramFacade) {
+    public TinderTelegramBot(TelegramFacade telegramFacade) {
         this.telegramFacade = telegramFacade;
     }
 
@@ -34,8 +39,15 @@ public class TinderBotV2 extends TelegramLongPollingBot {
     @Override
     public void onUpdateReceived(Update update) {
         try {
-            BotApiMethod<?> botApiMethod = telegramFacade.handleUpdate(update);
-            execute(botApiMethod);
+            PartialBotApiMethod<?> replyMessage = telegramFacade.handleUpdate(update);
+            if (replyMessage instanceof BotApiMethod) {
+                execute((BotApiMethod<? extends Serializable>) replyMessage);
+            } else if (replyMessage instanceof SendPhoto) {
+                execute((SendPhoto) replyMessage);
+            } else if (replyMessage instanceof EditMessageMedia) {
+                execute((EditMessageMedia) replyMessage);
+            }
+
         } catch (TelegramApiException e) {
             e.printStackTrace();
         }

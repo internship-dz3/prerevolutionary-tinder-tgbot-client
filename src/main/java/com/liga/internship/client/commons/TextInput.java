@@ -11,6 +11,7 @@ public class TextInput {
     public static final String CHANGE_PROFILE = "Изменить";
     public static final String SHOW_PROFILE = "Показать мою анкету";
     public static final String MAIN_MENU = "Главное меню";
+
     private TextInput() {
     }
 }

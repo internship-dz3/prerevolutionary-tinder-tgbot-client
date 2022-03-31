@@ -33,7 +33,7 @@ public class ImageCreatorService {
         File trend = null;
         try {
             Files.createDirectories(Paths.get("temp"));
-            trend = new File(String.format("temp/image%s.jpg",chatId));
+            trend = new File(String.format("temp/image%s.jpg", chatId));
             ImageIO.write(bufferedImage, "jpg", trend);
         } catch (IOException e) {
             e.printStackTrace();
@@ -88,7 +88,7 @@ public class ImageCreatorService {
         try {
             BufferedImage bufferedImage = getImageWithText2(userProfile.getDescription());
             Files.createDirectories(Paths.get("temp"));
-            trend = new File(String.format("temp/image%d.jpg",userId));
+            trend = new File(String.format("temp/image%d.jpg", userId));
             ImageIO.write(bufferedImage, "jpg", trend);
         } catch (IOException e) {
             e.printStackTrace();

@@ -8,7 +8,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 @Component
-public class  UserDataCache{
+public class UserDataCache {
     private final Map<Long, BotState> userBotStates = new HashMap<>();
     private final Map<Long, UserProfile> userProfileMap = new HashMap<>();
 

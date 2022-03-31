@@ -20,20 +20,6 @@ public class ProfileService {
         return createMessageWithKeyboard(chatId, message, replyKeyboardMarkup);
     }
 
-    public SendPhoto getMainMenuPhotoMessage(long chatId, File image, String caption, String... buttons) {
-        final ReplyKeyboardMarkup replyKeyboardMarkup = getMainMenuKeyboard(buttons);
-        return createPhotoMessageWithKeyboard(chatId, image, caption, replyKeyboardMarkup);
-    }
-
-    private SendPhoto createPhotoMessageWithKeyboard(long chatId, File image, String caption, ReplyKeyboard replyKeyboardMarkup) {
-        return SendPhoto.builder()
-                .photo(new InputFile(image))
-                .chatId(String.valueOf(chatId))
-                .replyMarkup(replyKeyboardMarkup)
-                .caption(caption)
-                .build();
-    }
-
     private SendMessage createMessageWithKeyboard(long chatId, String message, ReplyKeyboardMarkup replyKeyboardMarkup) {
         final SendMessage sendMessage = new SendMessage();
         sendMessage.enableMarkdown(true);
@@ -58,5 +44,19 @@ public class ProfileService {
         keyboard.add(row);
         replyKeyboardMarkup.setKeyboard(keyboard);
         return replyKeyboardMarkup;
+    }
+
+    public SendPhoto getMainMenuPhotoMessage(long chatId, File image, String caption, String... buttons) {
+        final ReplyKeyboardMarkup replyKeyboardMarkup = getMainMenuKeyboard(buttons);
+        return createPhotoMessageWithKeyboard(chatId, image, caption, replyKeyboardMarkup);
+    }
+
+    private SendPhoto createPhotoMessageWithKeyboard(long chatId, File image, String caption, ReplyKeyboard replyKeyboardMarkup) {
+        return SendPhoto.builder()
+                .photo(new InputFile(image))
+                .chatId(String.valueOf(chatId))
+                .replyMarkup(replyKeyboardMarkup)
+                .caption(caption)
+                .build();
     }
 }

@@ -9,12 +9,12 @@ import java.util.stream.Collectors;
 @Service
 public class TextService {
 
-    public StringBuilder translateTextIntoSlavOld(String text) {
+    public String translateTextIntoSlavOld(String text) {
         List<String> list = List.of(text.split(" "));
         List<String> modifiedList = list.stream().map(this::modifyEndOfTheWord).collect(Collectors.toList());
         StringBuilder result = new StringBuilder();
         modifiedList.forEach(result::append);
-        return replaceEandI(new StringBuilder(result));
+        return replaceEandI(new StringBuilder(result)).toString();
     }
 
     private String modifyEndOfTheWord(String word) {

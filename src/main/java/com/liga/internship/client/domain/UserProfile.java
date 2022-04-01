@@ -12,12 +12,12 @@ import static com.liga.internship.client.commons.TextInput.*;
 @Getter
 @Setter
 public class UserProfile {
+    private Long id;
     private Long telegramId;
     private String username;
     private Integer age = 20;
     private String description;
     private String gender;
-    private String speciality;
     private String look;
 
     public boolean setGender(String gender) {

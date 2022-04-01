@@ -8,6 +8,7 @@ import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.meta.api.methods.PartialBotApiMethod;
+import org.telegram.telegrambots.meta.api.objects.CallbackQuery;
 import org.telegram.telegrambots.meta.api.objects.Message;
 
 import java.io.File;
@@ -23,7 +24,7 @@ public class FillProfileHandler implements InputMessageHandler {
     private final ReplyMessageService messageService;
     private final ProfileService profileService;
     private final UserDataCache userDataCache;
-    private final ClientRestService clientRestService;
+    private final V1RestService v1RestService;
     private final ImageCreatorService imageCreatorService;
     private final MainMenuService mainMenuService;
 
@@ -31,6 +32,7 @@ public class FillProfileHandler implements InputMessageHandler {
     public BotState getHandlerName() {
         return FILLING_PROFILE_START;
     }
+
 
     @Override
     public PartialBotApiMethod<?> handleMessage(Message message) {
@@ -79,7 +81,11 @@ public class FillProfileHandler implements InputMessageHandler {
             if (userProfile.setLook(userAnswer)) {
                 File imageWithTextFile = imageCreatorService.getImageWithTextFile(userProfile, userId);
                 replyToUser = mainMenuService.getMainMenuPhotoMessage(chatId, imageWithTextFile, userProfile.getUsername());
-                clientRestService.registerNewUser(userProfile);
+                if (userProfile.getId() != null) {
+                    v1RestService.updateUser(userProfile);
+                } else {
+                    userProfile = v1RestService.registerNewUser(userProfile).get();
+                }
                 userDataCache.setUsersCurrentBotState(userId, SHOW_MAIN_MENU);
             } else {
                 String[] buttons = {MALE, FEMALE, ALL};

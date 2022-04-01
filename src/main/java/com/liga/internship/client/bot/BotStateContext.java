@@ -32,16 +32,30 @@ public class BotStateContext {
             return callbackHandlers.get(BotState.FILLING_PROFILE_START);
         }
         if (isVotingState(currentState)) {
-            return callbackHandlers.get(BotState.START_VOTING);
+            return callbackHandlers.get(BotState.START_TINDER);
+        }
+        if (isShowFavoritesState(currentState)) {
+            return callbackHandlers.get(BotState.SHOW_USER_FAVORITES);
         }
         return callbackHandlers.get(currentState);
     }
 
     private boolean isVotingState(BotState currentState) {
         switch (currentState) {
-            case START_VOTING:
+            case START_TINDER:
             case CONTINUE_VOTING:
             case STOP_VOTING:
+                return true;
+            default:
+                return false;
+        }
+    }
+
+    private boolean isShowFavoritesState(BotState currentState) {
+        switch (currentState) {
+            case SHOW_NEXT_FAVORITE:
+            case SHOW_PREV_FAVORITE:
+            case SHOW_USER_FAVORITES:
                 return true;
             default:
                 return false;
@@ -73,7 +87,10 @@ public class BotStateContext {
             return inputHandlers.get(BotState.FILLING_PROFILE_START);
         }
         if (isVotingState(currentState)) {
-            return inputHandlers.get(BotState.START_VOTING);
+            return inputHandlers.get(BotState.START_TINDER);
+        }
+        if (isShowFavoritesState(currentState)) {
+            return inputHandlers.get(BotState.SHOW_USER_FAVORITES);
         }
         return inputHandlers.get(currentState);
     }

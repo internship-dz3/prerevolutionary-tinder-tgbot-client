@@ -50,13 +50,16 @@ public class TelegramFacade {
                 botState = FILLING_PROFILE_START;
                 break;
             case SEARCH:
-                botState = START_VOTING;
+                botState = START_TINDER;
                 break;
             case USERFORM:
             case SHOW_PROFILE:
                 botState = SHOW_USER_PROFILE;
                 break;
             case FAVORITES:
+            case FAVORITE:
+            case ADMIRER:
+            case LOVE:
                 botState = SHOW_USER_FAVORITES;
                 break;
             case MAIN_MENU:

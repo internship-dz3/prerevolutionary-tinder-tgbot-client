@@ -23,7 +23,7 @@ public class UserDataCache {
     public BotState getUsersCurrentBotState(long userId) {
         BotState botState = userBotStates.get(userId);
         if (botState == null) {
-            botState = BotState.FILLING_PROFILE_START;
+            botState = BotState.LOGIN;
         }
         return botState;
     }

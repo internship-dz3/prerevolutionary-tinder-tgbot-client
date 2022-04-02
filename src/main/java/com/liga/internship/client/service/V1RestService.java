@@ -89,8 +89,8 @@ public class V1RestService {
                 .block();
     }
 
-    public boolean updateUser(UserProfile userProfile) {
-        return webClient.put()
+    public void updateUser(UserProfile userProfile) {
+        webClient.put()
                 .uri("http://localhost:8080/bibaboba/api/v1/user/update")
                 .header(CONTENT_TYPE, APPLICATION_JSON_VALUE)
                 .body(Mono.just(userProfile), UserProfile.class)

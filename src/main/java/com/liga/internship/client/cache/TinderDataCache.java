@@ -8,11 +8,20 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
+/**
+ * Данные хранящиеся в памяти для отображения участников голосования, для соответствующего пользователя
+ */
 @Component
 public class TinderDataCache {
     private final Map<Long, List<UserProfile>> listForProcess = new HashMap<>();
     private final Map<Long, UserProfile> usersInProcess = new HashMap<>();
 
+    /**
+     * Получение следующего опционального пользователя для голосования
+     *
+     * @param userId - ID активного пользователя(голосующего)
+     * @return опциональный пользователь или Optional.empty() при отсутвии
+     */
     public Optional<UserProfile> getNext(long userId) {
         if (listForProcess.containsKey(userId)) {
             List<UserProfile> profileList = listForProcess.get(userId);
@@ -23,19 +32,41 @@ public class TinderDataCache {
         return Optional.empty();
     }
 
-    public UserProfile getUserInProcess(long userId) {
+    /**
+     * Получение кандидата находящегося в состоянии голосования
+     *
+     * @param userId - ID активного пользователя(голосующего)
+     * @return - кандидат голосования
+     */
+    public UserProfile getUserFromVotingProcess(long userId) {
         return usersInProcess.remove(userId);
     }
 
+    /**
+     * Удаление списка голосования из кэша
+     *
+     * @param userId - ID активного пользователя(голосующего)
+     */
     public void removeProcessList(Long userId) {
         listForProcess.remove(userId);
     }
 
+    /**
+     * Внесения списка голосования в кэш
+     *
+     * @param userId - ID активного пользователя(голосующего)
+     * @param userProfiles - список кандидатов голосования
+     */
     public void setProcessDataList(Long userId, List<UserProfile> userProfiles) {
         listForProcess.put(userId, userProfiles);
     }
 
-    public void setToVoting(long userId, UserProfile userInProcess) {
+    /**
+     * Внесение в кэш кандидата голосования
+     * @param userId - ID активного пользователя(голосующего)
+     * @param userInProcess - кандидат голосования
+     */
+    public void setUserToVotingProcess(long userId, UserProfile userInProcess) {
         usersInProcess.put(userId, userInProcess);
     }
 }

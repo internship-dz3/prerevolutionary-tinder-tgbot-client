@@ -2,8 +2,8 @@ package com.liga.internship.client.domain;
 
 import lombok.*;
 
-import static com.liga.internship.client.commons.Button.*;
-import static com.liga.internship.client.commons.TextInput.*;
+import static com.liga.internship.client.commons.ButtonCallback.*;
+import static com.liga.internship.client.commons.ButtonInput.*;
 
 @AllArgsConstructor
 @NoArgsConstructor

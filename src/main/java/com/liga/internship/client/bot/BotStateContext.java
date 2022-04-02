@@ -29,20 +29,20 @@ public class BotStateContext {
 
     private InputCallbackHandler findCallbackHandler(BotState currentState) {
         if (isFillingProfileState(currentState)) {
-            return callbackHandlers.get(BotState.FILLING_PROFILE_START);
+            return callbackHandlers.get(BotState.HANDLER_PROFILE_FILLING);
         }
         if (isVotingState(currentState)) {
-            return callbackHandlers.get(BotState.START_TINDER);
+            return callbackHandlers.get(BotState.HANDLER_TINDER);
         }
         if (isShowFavoritesState(currentState)) {
-            return callbackHandlers.get(BotState.SHOW_USER_FAVORITES);
+            return callbackHandlers.get(BotState.HANDLER_SHOW_FAVORITES);
         }
         return callbackHandlers.get(currentState);
     }
 
     private boolean isVotingState(BotState currentState) {
         switch (currentState) {
-            case START_TINDER:
+            case HANDLER_TINDER:
             case CONTINUE_VOTING:
             case STOP_VOTING:
                 return true;
@@ -55,7 +55,7 @@ public class BotStateContext {
         switch (currentState) {
             case SHOW_NEXT_FAVORITE:
             case SHOW_PREV_FAVORITE:
-            case SHOW_USER_FAVORITES:
+            case HANDLER_SHOW_FAVORITES:
                 return true;
             default:
                 return false;
@@ -70,7 +70,7 @@ public class BotStateContext {
             case FILLING_PROFILE_ASK_NAME:
             case FILLING_PROFILE_ASK_DESCRIBE:
             case FILLING_PROFILE_COMPLETE:
-            case FILLING_PROFILE_START:
+            case HANDLER_PROFILE_FILLING:
                 return true;
             default:
                 return false;
@@ -84,13 +84,13 @@ public class BotStateContext {
 
     private InputMessageHandler findMessageHandler(BotState currentState) {
         if (isFillingProfileState(currentState)) {
-            return inputHandlers.get(BotState.FILLING_PROFILE_START);
+            return inputHandlers.get(BotState.HANDLER_PROFILE_FILLING);
         }
         if (isVotingState(currentState)) {
-            return inputHandlers.get(BotState.START_TINDER);
+            return inputHandlers.get(BotState.HANDLER_TINDER);
         }
         if (isShowFavoritesState(currentState)) {
-            return inputHandlers.get(BotState.SHOW_USER_FAVORITES);
+            return inputHandlers.get(BotState.HANDLER_SHOW_FAVORITES);
         }
         return inputHandlers.get(currentState);
     }

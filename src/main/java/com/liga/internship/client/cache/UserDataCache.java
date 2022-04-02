@@ -8,31 +8,58 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 
+/**
+ * Данные хранящиеся в памяти для хранения активных пользователей и хранения их состояния
+ */
 @Component
 public class UserDataCache {
     private final Map<Long, BotState> userBotStates = new HashMap<>();
     private final Map<Long, UserProfile> userProfileMap = new HashMap<>();
 
+    /**
+     * Получение опционального пользователя
+     *
+     * @param userId - ID юзера
+     * @return Optional.empty() если данный пользватель отсутствует в кэше
+     */
     public Optional<UserProfile> getUserProfile(long userId) {
         UserProfile userProfileData = userProfileMap.get(userId);
         if (userProfileData == null) {
-           return Optional.empty();
+            return Optional.empty();
         }
         return Optional.of(userProfileData);
     }
 
+    /**
+     * Получение актуального состояния пользователя
+     *
+     * @param userId - ID юзера
+     * @return актуальное состояние, если пользователь без состояния, состояние устанавливается в состояние логина
+     */
     public BotState getUsersCurrentBotState(long userId) {
         BotState botState = userBotStates.get(userId);
         if (botState == null) {
-            botState = BotState.LOGIN;
+            botState = BotState.HANDLER_LOGIN;
         }
         return botState;
     }
 
+    /**
+     * Сохранение активного пользователя в кэш
+     *
+     * @param userId-     ID юзера
+     * @param userProfile - активный профиль
+     */
     public void saveUserProfile(long userId, UserProfile userProfile) {
         userProfileMap.put(userId, userProfile);
     }
 
+    /**
+     * Сохранение актуального состояния пользователя
+     *
+     * @param userId-  ID юзера
+     * @param botState - состояние
+     */
     public void setUsersCurrentBotState(long userId, BotState botState) {
         userBotStates.put(userId, botState);
     }

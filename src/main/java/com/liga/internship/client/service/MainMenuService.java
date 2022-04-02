@@ -13,13 +13,18 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
-import static com.liga.internship.client.commons.TextInput.*;
+import static com.liga.internship.client.commons.ButtonInput.*;
 
 @Service
 public class MainMenuService {
     public SendMessage getMainMenuMessage(long chatId, String message) {
         final ReplyKeyboard replyKeyboardMarkup = getMainMenuKeyboard();
         return createMessageWithKeyboard(chatId, message, replyKeyboardMarkup);
+    }
+
+    public SendPhoto getMainMenuPhotoMessage(long chatId, File image, String caption) {
+        final ReplyKeyboard replyKeyboardMarkup = getMainMenuKeyboard();
+        return createPhotoMessageWithKeyboard(chatId, image, caption, replyKeyboardMarkup);
     }
 
     private SendMessage createMessageWithKeyboard(long chatId, String message, ReplyKeyboard replyKeyboardMarkup) {
@@ -33,12 +38,20 @@ public class MainMenuService {
         return sendMessage;
     }
 
+    private SendPhoto createPhotoMessageWithKeyboard(long chatId, File image, String caption, ReplyKeyboard replyKeyboardMarkup) {
+        return SendPhoto.builder()
+                .photo(new InputFile(image))
+                .chatId(String.valueOf(chatId))
+                .replyMarkup(replyKeyboardMarkup)
+                .caption(caption)
+                .build();
+    }
+
     private ReplyKeyboard getMainMenuKeyboard() {
         final ReplyKeyboardMarkup replyKeyboardMarkup = new ReplyKeyboardMarkup();
         replyKeyboardMarkup.setSelective(true);
         replyKeyboardMarkup.setResizeKeyboard(true);
         replyKeyboardMarkup.setOneTimeKeyboard(true);
-
         List<KeyboardRow> keyboard = new ArrayList<>();
         KeyboardRow row1 = new KeyboardRow();
         KeyboardRow row2 = new KeyboardRow();
@@ -52,19 +65,4 @@ public class MainMenuService {
         replyKeyboardMarkup.setKeyboard(keyboard);
         return replyKeyboardMarkup;
     }
-
-    public SendPhoto getMainMenuPhotoMessage(long chatId, File image, String caption) {
-        final ReplyKeyboard replyKeyboardMarkup = getMainMenuKeyboard();
-        return createPhotoMessageWithKeyboard(chatId, image, caption, replyKeyboardMarkup);
-    }
-
-    private SendPhoto createPhotoMessageWithKeyboard(long chatId, File image, String caption, ReplyKeyboard replyKeyboardMarkup) {
-        return SendPhoto.builder()
-                .photo(new InputFile(image))
-                .chatId(String.valueOf(chatId))
-                .replyMarkup(replyKeyboardMarkup)
-                .caption(caption)
-                .build();
-    }
-
 }

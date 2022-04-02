@@ -14,11 +14,15 @@ import org.telegram.telegrambots.meta.api.objects.Message;
 import java.io.File;
 import java.util.Optional;
 
-import static com.liga.internship.client.bot.BotState.LOGIN;
-import static com.liga.internship.client.commons.TextInput.CHANGE_PROFILE;
-import static com.liga.internship.client.commons.TextInput.MAIN_MENU;
+import static com.liga.internship.client.bot.BotState.HANDLER_LOGIN;
+import static com.liga.internship.client.commons.ButtonInput.CHANGE_PROFILE;
+import static com.liga.internship.client.commons.ButtonInput.MAIN_MENU;
 import static com.liga.internship.client.commons.TextMessage.MESSAGE_COMEBACK;
 
+/**
+ * Обработчик входящих Messageсообщений телеграм бота, связанных с просмотром профиля пользователя и соответствующего меню.
+ * Обработчик хранит состояние просматриваемых данных.
+ */
 @Component
 @AllArgsConstructor
 public class ShowProfileHandler implements InputMessageHandler {
@@ -38,10 +42,10 @@ public class ShowProfileHandler implements InputMessageHandler {
         long chatId = message.getChatId();
         Optional<UserProfile> optionalUserProfile = userDataCache.getUserProfile(userId);
         UserProfile userProfile;
-        if(optionalUserProfile.isPresent()) {
+        if (optionalUserProfile.isPresent()) {
             userProfile = optionalUserProfile.get();
         } else {
-            userDataCache.setUsersCurrentBotState(userId, LOGIN);
+            userDataCache.setUsersCurrentBotState(userId, HANDLER_LOGIN);
             return mainMenuService.getMainMenuMessage(chatId, MESSAGE_COMEBACK);
         }
         File imageWithTextFile = imageCreatorService.getImageWithTextFile(userProfile, userId);

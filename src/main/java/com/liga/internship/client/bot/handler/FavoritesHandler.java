@@ -4,7 +4,10 @@ import com.liga.internship.client.bot.BotState;
 import com.liga.internship.client.cache.FavoritesDataCache;
 import com.liga.internship.client.cache.UserDataCache;
 import com.liga.internship.client.domain.UserProfile;
-import com.liga.internship.client.service.*;
+import com.liga.internship.client.service.FavoritesService;
+import com.liga.internship.client.service.ImageCreatorService;
+import com.liga.internship.client.service.MainMenuService;
+import com.liga.internship.client.service.V1RestService;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.telegram.telegrambots.meta.api.methods.PartialBotApiMethod;
@@ -17,10 +20,14 @@ import java.util.List;
 import java.util.Optional;
 
 import static com.liga.internship.client.bot.BotState.*;
-import static com.liga.internship.client.commons.Button.*;
-import static com.liga.internship.client.commons.TextInput.*;
+import static com.liga.internship.client.commons.ButtonCallback.*;
+import static com.liga.internship.client.commons.ButtonInput.*;
 import static com.liga.internship.client.commons.TextMessage.*;
 
+/**
+ * Обработчик входящих Message и CallbackQuery сообщений телеграм бота, связанных с просмотром страниц Любимцев.
+ * Обработчик хранит состояние просматриваемых данных.
+ */
 @Service
 @AllArgsConstructor
 public class FavoritesHandler implements InputCallbackHandler, InputMessageHandler {
@@ -30,11 +37,10 @@ public class FavoritesHandler implements InputCallbackHandler, InputMessageHandl
     private final ImageCreatorService imageCreatorService;
     private final FavoritesDataCache favoritesDataCache;
     private final MainMenuService mainMenuService;
-    private final ReplyMessageService replyMessageService;
 
     @Override
     public BotState getHandlerName() {
-        return BotState.SHOW_USER_FAVORITES;
+        return BotState.HANDLER_SHOW_FAVORITES;
     }
 
     @Override
@@ -64,9 +70,9 @@ public class FavoritesHandler implements InputCallbackHandler, InputMessageHandl
             userDataCache.setUsersCurrentBotState(userId, SHOW_PREV_FAVORITE);
         }
         if (callbackData.equals(CALLBACK_MENU)) {
-            favoritesDataCache.removeProcessList(userId);
+            favoritesDataCache.removeFaforites(userId);
             replyMessage = mainMenuService.getMainMenuMessage(chatId, MESSAGE_MAIN_MENU);
-            userDataCache.setUsersCurrentBotState(userId, SHOW_MAIN_MENU);
+            userDataCache.setUsersCurrentBotState(userId, HANDLER_MAIN_MENU);
         }
         return replyMessage;
     }
@@ -78,10 +84,10 @@ public class FavoritesHandler implements InputCallbackHandler, InputMessageHandl
         long chatId = message.getChatId();
         Optional<UserProfile> optionalUserProfile = userDataCache.getUserProfile(userId);
         UserProfile currentUser;
-        if(optionalUserProfile.isPresent()) {
+        if (optionalUserProfile.isPresent()) {
             currentUser = optionalUserProfile.get();
-        } else{
-            userDataCache.setUsersCurrentBotState(userId, LOGIN);
+        } else {
+            userDataCache.setUsersCurrentBotState(userId, HANDLER_LOGIN);
             return mainMenuService.getMainMenuMessage(chatId, MESSAGE_COMEBACK);
         }
         long currentUserId = currentUser.getId();
@@ -103,7 +109,7 @@ public class FavoritesHandler implements InputCallbackHandler, InputMessageHandl
         }
         if (userButtonInput.equals(FAVORITES)) {
             replyMessage = favoritesService.getReplyKeyboardTextMessage(chatId, MESSAGE_FAVORITE);
-            userDataCache.setUsersCurrentBotState(userId, SHOW_USER_FAVORITES);
+            userDataCache.setUsersCurrentBotState(userId, HANDLER_SHOW_FAVORITES);
         }
         return replyMessage;
     }

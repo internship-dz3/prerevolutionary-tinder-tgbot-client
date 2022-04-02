@@ -12,6 +12,9 @@ import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
 import java.io.Serializable;
 
+/**
+ * Основной бин телеграм бота
+ */
 @Component
 public class TinderTelegramBot extends TelegramLongPollingBot {
     private final TelegramFacade telegramFacade;

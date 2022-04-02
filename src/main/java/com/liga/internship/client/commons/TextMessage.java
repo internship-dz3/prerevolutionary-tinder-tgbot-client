@@ -10,6 +10,8 @@ public class TextMessage {
     public static final String MESSAGE_FAVORITE = "Кого изволите увидеть?";
     public static final String MESSAGE_EMPTY = "Пустота то какая!! Пустота!";
     public static final String MESSAGE_COMEBACK = "С возвращением";
+    public static final String MESSAGE_COMEBACK_LATER = "Отличная работа, приходите позже!";
+
     private TextMessage() {
     }
 }

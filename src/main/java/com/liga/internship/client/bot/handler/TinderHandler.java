@@ -5,7 +5,10 @@ import com.liga.internship.client.cache.TinderDataCache;
 import com.liga.internship.client.cache.UserDataCache;
 import com.liga.internship.client.domain.UserProfile;
 import com.liga.internship.client.domain.dto.UsersIdTo;
-import com.liga.internship.client.service.*;
+import com.liga.internship.client.service.ImageCreatorService;
+import com.liga.internship.client.service.MainMenuService;
+import com.liga.internship.client.service.TinderService;
+import com.liga.internship.client.service.V1RestService;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
@@ -19,8 +22,7 @@ import java.util.Optional;
 
 import static com.liga.internship.client.bot.BotState.*;
 import static com.liga.internship.client.commons.Button.*;
-import static com.liga.internship.client.commons.TextMessage.MESSAGE_COMEBACK;
-import static com.liga.internship.client.commons.TextMessage.MESSAGE_MAIN_MENU;
+import static com.liga.internship.client.commons.TextMessage.*;
 
 @Slf4j
 @Component
@@ -57,7 +59,8 @@ public class TinderHandler implements InputMessageHandler, InputCallbackHandler 
         List<UserProfile> notRatedUsers = v1RestService.getNotRatedUsers(userProfile);
         PartialBotApiMethod<?> userReply;
         if (notRatedUsers.isEmpty()) {
-            userReply = mainMenuService.getMainMenuMessage(chatId, "Идите работать!");
+            tinderDataCache.removeProcessList(userId);
+            userReply = mainMenuService.getMainMenuMessage(chatId, MESSAGE_COMEBACK_LATER);
         } else if (notRatedUsers.size() == 1) {
             UserProfile next = notRatedUsers.remove(0);
             tinderDataCache.setToVoting(userId, next);

@@ -31,6 +31,20 @@ public class ProfileService {
         return sendMessage;
     }
 
+    public SendPhoto getMainMenuPhotoMessage(long chatId, File image, String caption, String... buttons) {
+        final ReplyKeyboardMarkup replyKeyboardMarkup = getMainMenuKeyboard(buttons);
+        return createPhotoMessageWithKeyboard(chatId, image, caption, replyKeyboardMarkup);
+    }
+
+    private SendPhoto createPhotoMessageWithKeyboard(long chatId, File image, String caption, ReplyKeyboard replyKeyboardMarkup) {
+        return SendPhoto.builder()
+                .photo(new InputFile(image))
+                .chatId(String.valueOf(chatId))
+                .replyMarkup(replyKeyboardMarkup)
+                .caption(caption)
+                .build();
+    }
+
     private ReplyKeyboardMarkup getMainMenuKeyboard(String... buttons) {
         final ReplyKeyboardMarkup replyKeyboardMarkup = new ReplyKeyboardMarkup();
         replyKeyboardMarkup.setSelective(true);
@@ -44,19 +58,5 @@ public class ProfileService {
         keyboard.add(row);
         replyKeyboardMarkup.setKeyboard(keyboard);
         return replyKeyboardMarkup;
-    }
-
-    public SendPhoto getMainMenuPhotoMessage(long chatId, File image, String caption, String... buttons) {
-        final ReplyKeyboardMarkup replyKeyboardMarkup = getMainMenuKeyboard(buttons);
-        return createPhotoMessageWithKeyboard(chatId, image, caption, replyKeyboardMarkup);
-    }
-
-    private SendPhoto createPhotoMessageWithKeyboard(long chatId, File image, String caption, ReplyKeyboard replyKeyboardMarkup) {
-        return SendPhoto.builder()
-                .photo(new InputFile(image))
-                .chatId(String.valueOf(chatId))
-                .replyMarkup(replyKeyboardMarkup)
-                .caption(caption)
-                .build();
     }
 }

@@ -1,5 +1,8 @@
 package com.liga.internship.client.commons;
 
+/**
+ * Сообщения для пользователя
+ */
 public class TextMessage {
     public static final String MESSAGE_WELCOME = "Добро пожаловать!";
     public static final String MESSAGE_CHOOSE_YOUR_GENDER = "Вы сударь иль сударыня?";

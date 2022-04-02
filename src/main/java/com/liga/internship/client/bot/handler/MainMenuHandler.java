@@ -9,7 +9,10 @@ import org.telegram.telegrambots.meta.api.objects.CallbackQuery;
 import org.telegram.telegrambots.meta.api.objects.Message;
 
 import static com.liga.internship.client.commons.TextMessage.MESSAGE_MAIN_MENU;
-
+/**
+ * Обработчик входящих Message и CallbackQuery сообщений телеграм бота, связанных с отображением главного меню.
+ * Обработчик хранит состояние просматриваемых данных.
+ */
 @Component
 @AllArgsConstructor
 public class MainMenuHandler implements InputMessageHandler, InputCallbackHandler {
@@ -17,7 +20,7 @@ public class MainMenuHandler implements InputMessageHandler, InputCallbackHandle
 
     @Override
     public BotState getHandlerName() {
-        return BotState.SHOW_MAIN_MENU;
+        return BotState.HANDLER_MAIN_MENU;
     }
 
     @Override

@@ -14,9 +14,13 @@ import java.io.File;
 import java.util.Optional;
 
 import static com.liga.internship.client.bot.BotState.*;
-import static com.liga.internship.client.commons.TextInput.*;
+import static com.liga.internship.client.commons.ButtonInput.*;
 import static com.liga.internship.client.commons.TextMessage.*;
 
+/**
+ * Обработчик входящих Message сообщений телеграм бота, связанных с заполнением профиля пользователя.
+ * Обработчик хранит состояние просматриваемых данных.
+ */
 @Slf4j
 @Component
 @AllArgsConstructor
@@ -30,13 +34,13 @@ public class FillProfileHandler implements InputMessageHandler {
 
     @Override
     public BotState getHandlerName() {
-        return FILLING_PROFILE_START;
+        return HANDLER_PROFILE_FILLING;
     }
 
 
     @Override
     public PartialBotApiMethod<?> handleMessage(Message message) {
-        if (userDataCache.getUsersCurrentBotState(message.getFrom().getId()).equals(FILLING_PROFILE_START)) {
+        if (userDataCache.getUsersCurrentBotState(message.getFrom().getId()).equals(HANDLER_PROFILE_FILLING)) {
             userDataCache.setUsersCurrentBotState(message.getFrom().getId(), FILLING_PROFILE_ASK_GENDER);
         }
         return processUserInput(message);
@@ -48,10 +52,10 @@ public class FillProfileHandler implements InputMessageHandler {
         long chatId = message.getChatId();
         Optional<UserProfile> optionalUserProfile = userDataCache.getUserProfile(userId);
         UserProfile userProfile;
-        if(optionalUserProfile.isPresent()) {
+        if (optionalUserProfile.isPresent()) {
             userProfile = optionalUserProfile.get();
         } else {
-            userDataCache.setUsersCurrentBotState(userId, LOGIN);
+            userDataCache.setUsersCurrentBotState(userId, HANDLER_LOGIN);
             return mainMenuService.getMainMenuMessage(chatId, MESSAGE_COMEBACK);
         }
         BotState botState = userDataCache.getUsersCurrentBotState(userId);
@@ -92,12 +96,12 @@ public class FillProfileHandler implements InputMessageHandler {
                     v1RestService.updateUser(userProfile);
                 } else {
                     Optional<UserProfile> optionalNewUser = v1RestService.registerNewUser(userProfile);
-                    if(optionalNewUser.isPresent()) {
-                        userDataCache.setUsersCurrentBotState(userId, LOGIN);
+                    if (optionalNewUser.isPresent()) {
+                        userDataCache.setUsersCurrentBotState(userId, HANDLER_LOGIN);
                         return mainMenuService.getMainMenuMessage(chatId, MESSAGE_COMEBACK);
                     }
                 }
-                userDataCache.setUsersCurrentBotState(userId, SHOW_MAIN_MENU);
+                userDataCache.setUsersCurrentBotState(userId, HANDLER_MAIN_MENU);
             } else {
                 String[] buttons = {MALE, FEMALE, ALL};
                 replyToUser = profileService.getChooseButtons(chatId, MESSAGE_LOOKFOR, buttons);

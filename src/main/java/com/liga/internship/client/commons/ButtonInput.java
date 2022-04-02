@@ -1,6 +1,9 @@
 package com.liga.internship.client.commons;
 
-public class TextInput {
+/**
+ * Текст кнопок для KeyboardButton
+ */
+public class ButtonInput {
     public static final String START = "/start";
     public static final String MALE = "Сударь";
     public static final String FEMALE = "Сударыня";
@@ -14,6 +17,6 @@ public class TextInput {
     public static final String FAVORITE = "Мои любимцы";
     public static final String ADMIRER = "Я любимец";
     public static final String LOVE = "Взаимность";
-    private TextInput() {
+    private ButtonInput() {
     }
 }

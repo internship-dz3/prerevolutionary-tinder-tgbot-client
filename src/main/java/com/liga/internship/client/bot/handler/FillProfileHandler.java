@@ -21,6 +21,7 @@ import static com.liga.internship.client.commons.TextMessage.*;
 @Component
 @AllArgsConstructor
 public class FillProfileHandler implements InputMessageHandler {
+
     private final ReplyMessageService replyMessageService;
     private final ProfileService profileService;
     private final UserDataCache userDataCache;
@@ -30,12 +31,18 @@ public class FillProfileHandler implements InputMessageHandler {
 
     @Override
     public BotState getHandlerName() {
+        if (log.isDebugEnabled()) {
+            log.info("getting MenuInlineKeyBoardService");
+        }
         return FILLING_PROFILE_START;
     }
 
 
     @Override
     public PartialBotApiMethod<?> handleMessage(Message message) {
+        if (log.isDebugEnabled()) {
+            log.info("getting MenuInlineKeyBoardService");
+        }
         if (userDataCache.getUsersCurrentBotState(message.getFrom().getId()).equals(FILLING_PROFILE_START)) {
             userDataCache.setUsersCurrentBotState(message.getFrom().getId(), FILLING_PROFILE_ASK_GENDER);
         }
@@ -43,12 +50,15 @@ public class FillProfileHandler implements InputMessageHandler {
     }
 
     private PartialBotApiMethod<?> processUserInput(Message message) {
+        if (log.isDebugEnabled()) {
+            log.info("getting MenuInlineKeyBoardService");
+        }
         String userAnswer = message.getText();
         long userId = message.getFrom().getId();
         long chatId = message.getChatId();
         Optional<UserProfile> optionalUserProfile = userDataCache.getUserProfile(userId);
         UserProfile userProfile;
-        if(optionalUserProfile.isPresent()) {
+        if (optionalUserProfile.isPresent()) {
             userProfile = optionalUserProfile.get();
         } else {
             userDataCache.setUsersCurrentBotState(userId, LOGIN);
@@ -92,7 +102,7 @@ public class FillProfileHandler implements InputMessageHandler {
                     v1RestService.updateUser(userProfile);
                 } else {
                     Optional<UserProfile> optionalNewUser = v1RestService.registerNewUser(userProfile);
-                    if(optionalNewUser.isPresent()) {
+                    if (optionalNewUser.isPresent()) {
                         userDataCache.setUsersCurrentBotState(userId, LOGIN);
                         return mainMenuService.getMainMenuMessage(chatId, MESSAGE_COMEBACK);
                     }

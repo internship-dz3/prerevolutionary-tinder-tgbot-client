@@ -1,7 +1,10 @@
 package com.liga.internship.client.service;
 
 import com.liga.internship.client.commons.Button;
+import com.liga.internship.client.domain.UserProfile;
 import lombok.AllArgsConstructor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.telegram.telegrambots.meta.api.methods.PartialBotApiMethod;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
@@ -16,21 +19,28 @@ import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKe
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.KeyboardButton;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.KeyboardRow;
 
+
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
 import static com.liga.internship.client.commons.TextInput.*;
 
+
 @Service
 @AllArgsConstructor
 public class FavoritesService {
+
+    private final Logger log = LoggerFactory.getLogger(FavoritesService.class);
+
     public PartialBotApiMethod<?> getMenuInlineKeyBoardService(long chatId, File image, String caption) {
+
         final InlineKeyboardMarkup replyKeyboardMarkup = getInlineOneMenuKeyboard();
         return createPhotoMessageWithInlineKeyBoard(chatId, image, caption, replyKeyboardMarkup);
     }
 
     private InlineKeyboardMarkup getInlineOneMenuKeyboard() {
+
         final InlineKeyboardMarkup inlineKeyboardMarkup = new InlineKeyboardMarkup();
         List<List<InlineKeyboardButton>> rowsInline = new ArrayList<>();
         List<InlineKeyboardButton> menuRow = new ArrayList<>();
@@ -41,6 +51,7 @@ public class FavoritesService {
     }
 
     private InlineKeyboardButton getInlineKeyboardButton(String buttonText, String buttonCommand) {
+
         InlineKeyboardButton inlineKeyboardButton = new InlineKeyboardButton();
         inlineKeyboardButton.setText(buttonText);
         inlineKeyboardButton.setCallbackData(buttonCommand);
@@ -48,6 +59,7 @@ public class FavoritesService {
     }
 
     private SendPhoto createPhotoMessageWithInlineKeyBoard(long chatId, File image, String caption, ReplyKeyboard replyKeyboardMarkup) {
+
         return SendPhoto.builder()
                 .photo(new InputFile(image))
                 .chatId(String.valueOf(chatId))
@@ -125,5 +137,10 @@ public class FavoritesService {
         keyboard.add(row2);
         replyKeyboardMarkup.setKeyboard(keyboard);
         return replyKeyboardMarkup;
+    }
+
+    public Logger getLog() {
+        log.isDebugEnabled();
+        return log;
     }
 }

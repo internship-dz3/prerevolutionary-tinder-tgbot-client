@@ -9,7 +9,7 @@ public class TextMessage {
     public static final String MESSAGE_MAIN_MENU = "Чего изволите?";
     public static final String MESSAGE_FAVORITE = "Кого изволите увидеть?";
     public static final String MESSAGE_EMPTY = "Пустота то какая!! Пустота!";
-
+    public static final String MESSAGE_COMEBACK = "С возвращением";
     private TextMessage() {
     }
 }

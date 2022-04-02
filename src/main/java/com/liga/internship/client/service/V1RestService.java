@@ -31,14 +31,6 @@ public class V1RestService {
                 .block();
     }
 
-    public List<UserProfile> getLoveList(long userId) {
-        return webClient.get().uri(String.format("http://localhost:8080/bibaboba/api/v1/user/%d/lovers", userId))
-                .retrieve()
-                .bodyToFlux(UserProfile.class)
-                .collectList()
-                .block();
-    }
-
     public List<UserProfile> getFavoritesList(long userId) {
         return webClient.get().uri(String.format("http://localhost:8080/bibaboba/api/v1/user/%d/likes", userId))
                 .retrieve()
@@ -47,8 +39,19 @@ public class V1RestService {
                 .block();
     }
 
-    public List<UserProfile> getNotRatedUsers(long userId) {
-        return webClient.get().uri("http://localhost:8080/bibaboba/api/v1/user/list/" + userId)
+    public List<UserProfile> getLoveList(long userId) {
+        return webClient.get().uri(String.format("http://localhost:8080/bibaboba/api/v1/user/%d/lovers", userId))
+                .retrieve()
+                .bodyToFlux(UserProfile.class)
+                .collectList()
+                .block();
+    }
+
+    public List<UserProfile> getNotRatedUsers(UserProfile userProfile) {
+        return webClient.post()
+                .uri("http://localhost:8080/bibaboba/api/v1/user/list/")
+                .header(CONTENT_TYPE, APPLICATION_JSON_VALUE)
+                .body(Mono.just(userProfile), UserProfile.class)
                 .retrieve()
                 .bodyToFlux(UserProfile.class)
                 .collectList()
@@ -56,7 +59,8 @@ public class V1RestService {
     }
 
     public Optional<UserProfile> registerNewUser(UserProfile userProfile) {
-        Mono<UserProfile> register = webClient.post().uri("http://localhost:8080/bibaboba/api/v1/user/register")
+        Mono<UserProfile> register = webClient.post()
+                .uri("http://localhost:8080/bibaboba/api/v1/user/register")
                 .header(CONTENT_TYPE, APPLICATION_JSON_VALUE)
                 .body(Mono.just(userProfile), UserProfile.class)
                 .retrieve()
@@ -76,7 +80,8 @@ public class V1RestService {
     }
 
     public void sendLikeRequest(UsersIdTo usersIdTo) {
-        webClient.post().uri("http://localhost:8080/bibaboba/api/v1/user/like")
+        webClient.post()
+                .uri("http://localhost:8080/bibaboba/api/v1/user/like")
                 .header(CONTENT_TYPE, APPLICATION_JSON_VALUE)
                 .body(Mono.just(usersIdTo), UsersIdTo.class)
                 .retrieve()
@@ -84,11 +89,14 @@ public class V1RestService {
                 .block();
     }
 
-    public void updateUser(UserProfile userProfile) {
-        webClient.put().uri("http://localhost:8080/bibaboba/api/v1/user/update")
+    public boolean updateUser(UserProfile userProfile) {
+        return webClient.put()
+                .uri("http://localhost:8080/bibaboba/api/v1/user/update")
                 .header(CONTENT_TYPE, APPLICATION_JSON_VALUE)
                 .body(Mono.just(userProfile), UserProfile.class)
-                .retrieve();
+                .retrieve()
+                .bodyToMono(Boolean.class)
+                .block();
     }
 
     public Optional<UserProfile> userLogin(long telegramId) {

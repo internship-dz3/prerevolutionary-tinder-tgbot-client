@@ -6,18 +6,19 @@ import org.springframework.stereotype.Component;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 
 @Component
 public class UserDataCache {
     private final Map<Long, BotState> userBotStates = new HashMap<>();
     private final Map<Long, UserProfile> userProfileMap = new HashMap<>();
 
-    public UserProfile getUserProfile(long userId) {
+    public Optional<UserProfile> getUserProfile(long userId) {
         UserProfile userProfileData = userProfileMap.get(userId);
         if (userProfileData == null) {
-            userProfileData = new UserProfile();
+           return Optional.empty();
         }
-        return userProfileData;
+        return Optional.of(userProfileData);
     }
 
     public BotState getUsersCurrentBotState(long userId) {

@@ -14,6 +14,9 @@ import java.io.File;
 import java.util.Optional;
 
 import static com.liga.internship.client.bot.BotState.*;
+import static com.liga.internship.client.commons.ButtonCallback.CALLBACK_FEMALE;
+import static com.liga.internship.client.commons.ButtonCallback.CALLBACK_MALE;
+import static com.liga.internship.client.commons.ButtonInput.MALE;
 import static com.liga.internship.client.commons.TextMessage.*;
 
 /**
@@ -30,6 +33,7 @@ public class FillProfileHandler implements InputMessageHandler {
     private final V1RestService v1RestService;
     private final ImageCreatorService imageCreatorService;
     private final MainMenuService mainMenuService;
+    private final TextService textService;
 
     @Override
     public BotState getHandlerName() {
@@ -75,8 +79,8 @@ public class FillProfileHandler implements InputMessageHandler {
         if (botState.equals(FILLING_PROFILE_COMPLETE)) {
             if (userProfile.setLookByButtonCallback(userAnswer)) {
                 userProfile = getRegisteredUserProfile(userProfile);
-                imageWithTextFile = imageCreatorService.getImageWithTextFile(userProfile, userId);
-                replyToUser = mainMenuService.getMainMenuPhotoMessage(chatId, imageWithTextFile, userProfile.getUsername());
+                imageWithTextFile = imageCreatorService.getImageWithTextFile(userProfile.getDescription(), userId);
+                replyToUser = mainMenuService.getMainMenuPhotoMessage(chatId, imageWithTextFile, getCaptureFromUserProfile(userProfile));
                 userDataCache.setUsersCurrentBotState(userId, HANDLER_MAIN_MENU);
             } else {
                 replyToUser = profileService.getMessageWithgetLookGenderChooseKeyboard(chatId, MESSAGE_LOOKFOR);
@@ -111,5 +115,11 @@ public class FillProfileHandler implements InputMessageHandler {
             }
         }
         return userProfile;
+    }
+
+    private String getCaptureFromUserProfile(UserProfile userProfile) {
+        String gender = userProfile.getGender().equals(CALLBACK_MALE) ? MALE : CALLBACK_FEMALE;
+        String username = textService.translateTextIntoSlavOld(userProfile.getUsername());
+        return String.format("%s, %s", gender, username);
     }
 }

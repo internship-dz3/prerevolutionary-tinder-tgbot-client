@@ -56,7 +56,7 @@ public class FavoritesHandler implements InputCallbackHandler, InputMessageHandl
                 nextUser = favoritesDataCache.getNextUser(userId);
             }
             messageCaption = createMessageCation(userId, nextUser);
-            imageWithTextFile = imageCreatorService.getImageWithTextFile(nextUser, userId);
+            imageWithTextFile = imageCreatorService.getImageWithTextFile(nextUser.getDescription(), userId);
             replyMessage = favoritesService.getNextPrevInlineKeyboardEditedMessage(chatId, messageId, imageWithTextFile, messageCaption);
             userDataCache.setUsersCurrentBotState(userId, SHOW_NEXT_FAVORITE);
         }
@@ -66,7 +66,7 @@ public class FavoritesHandler implements InputCallbackHandler, InputMessageHandl
                 nextUser = favoritesDataCache.getPrevious(userId);
             }
             messageCaption = createMessageCation(userId, nextUser);
-            imageWithTextFile = imageCreatorService.getImageWithTextFile(nextUser, userId);
+            imageWithTextFile = imageCreatorService.getImageWithTextFile(nextUser.getDescription(), userId);
             replyMessage = favoritesService.getNextPrevInlineKeyboardEditedMessage(chatId, messageId, imageWithTextFile, messageCaption);
             userDataCache.setUsersCurrentBotState(userId, SHOW_PREV_FAVORITE);
         }
@@ -105,7 +105,7 @@ public class FavoritesHandler implements InputCallbackHandler, InputMessageHandl
         if (favoritesList.size() == 1) {
             UserProfile userProfile = favoritesList.get(0);
             messageCaption = createMessageCation(userId, userProfile);
-            imageWithTextFile = imageCreatorService.getImageWithTextFile(userProfile, userId);
+            imageWithTextFile = imageCreatorService.getImageWithTextFile(userProfile.getDescription(), userId);
             replyMessage = favoritesService.getMenuInlineKeyBoardService(chatId, imageWithTextFile, messageCaption);
         } else if (favoritesList.isEmpty()) {
             replyMessage = favoritesService.getReplyFavoritesKeyboardTextMessage(chatId, MESSAGE_EMPTY);
@@ -113,7 +113,7 @@ public class FavoritesHandler implements InputCallbackHandler, InputMessageHandl
             favoritesDataCache.setProcessDataList(userId, favoritesList);
             UserProfile showFirst = favoritesDataCache.getNextUser(userId);
             messageCaption = createMessageCation(userId, showFirst);
-            imageWithTextFile = imageCreatorService.getImageWithTextFile(showFirst, userId);
+            imageWithTextFile = imageCreatorService.getImageWithTextFile(showFirst.getDescription(), userId);
             replyMessage = favoritesService.getNextPrevInlineKeyboardPhotoMessage(chatId, imageWithTextFile, messageCaption);
         }
 

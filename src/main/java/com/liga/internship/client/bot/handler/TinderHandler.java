@@ -22,7 +22,8 @@ import java.util.Optional;
 
 import static com.liga.internship.client.bot.BotState.*;
 import static com.liga.internship.client.commons.ButtonCallback.*;
-import static com.liga.internship.client.commons.TextMessage.*;
+import static com.liga.internship.client.commons.TextMessage.MESSAGE_COMEBACK_LATER;
+import static com.liga.internship.client.commons.TextMessage.MESSAGE_MAIN_MENU;
 
 /**
  * Обработчик входящих Message и CallbackQuery сообщений телеграм бота, связанных с голосованием.
@@ -52,14 +53,7 @@ public class TinderHandler implements InputMessageHandler, InputCallbackHandler 
     }
 
     private PartialBotApiMethod<?> startVoting(long userId, long chatId) {
-        Optional<UserProfile> optionalUserProfile = userDataCache.getUserProfile(userId);
-        UserProfile userProfile;
-        if (optionalUserProfile.isPresent()) {
-            userProfile = optionalUserProfile.get();
-        } else {
-            userDataCache.setUsersCurrentBotState(userId, HANDLER_LOGIN);
-            return mainMenuService.getMainMenuMessage(chatId, MESSAGE_COMEBACK);
-        }
+        UserProfile userProfile = userDataCache.getUserProfile(userId);
         List<UserProfile> notRatedUsers = v1RestService.getNotRatedUsers(userProfile);
         PartialBotApiMethod<?> userReply;
         if (notRatedUsers.isEmpty()) {
@@ -88,14 +82,7 @@ public class TinderHandler implements InputMessageHandler, InputCallbackHandler 
         long userId = callbackQuery.getFrom().getId();
         long chatId = callbackQuery.getMessage().getChatId();
         int messageId = callbackQuery.getMessage().getMessageId();
-        Optional<UserProfile> optionalUserProfile = userDataCache.getUserProfile(userId);
-        UserProfile currentUser;
-        if (optionalUserProfile.isPresent()) {
-            currentUser = optionalUserProfile.get();
-        } else {
-            userDataCache.setUsersCurrentBotState(userId, HANDLER_LOGIN);
-            return mainMenuService.getMainMenuMessage(chatId, MESSAGE_COMEBACK);
-        }
+        UserProfile currentUser = userDataCache.getUserProfile(userId);
         PartialBotApiMethod<?> reply;
         if (callbackQueryData.equals(CALLBACK_MENU)) {
             userDataCache.setUsersCurrentBotState(userId, HANDLER_MAIN_MENU);

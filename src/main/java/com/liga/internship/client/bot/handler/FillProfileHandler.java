@@ -75,7 +75,7 @@ public class FillProfileHandler implements InputMessageHandler {
         if (botState.equals(FILLING_PROFILE_COMPLETE)) {
             if (userProfile.setLookByButtonCallback(userAnswer)) {
                 userProfile = getRegisteredUserProfile(userProfile);
-                imageWithTextFile = imageCreatorService.getImageWithTextFile(userProfile, userId);
+                imageWithTextFile = imageCreatorService.getImageWithTextFile(userProfile.getDescription(), userId);
                 replyToUser = mainMenuService.getMainMenuPhotoMessage(chatId, imageWithTextFile, userProfile.getUsername());
                 userDataCache.setUsersCurrentBotState(userId, HANDLER_MAIN_MENU);
             } else {

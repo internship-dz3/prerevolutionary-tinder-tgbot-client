@@ -13,6 +13,11 @@ import java.util.Map;
 @Component
 public class FavoritesDataCache {
     private final Map<Long, List<UserProfile>> userFavorites = new HashMap<>();
+    private final Map<Long, String> favoritesListStatus = new HashMap<>();
+
+    public String getFaforiteListStatus(long userId) {
+        return favoritesListStatus.get(userId);
+    }
 
     /**
      * Получение следующего пользователя по списку
@@ -47,6 +52,14 @@ public class FavoritesDataCache {
      */
     public void removeFaforites(long userId) {
         userFavorites.remove(userId);
+    }
+
+    /**
+     * @param userId       -ID юзера
+     * @param favoriteType - тип поиска любимцев
+     */
+    public void setFavoriteSearchStatus(long userId, String favoriteType) {
+        favoritesListStatus.put(userId, favoriteType);
     }
 
     /**

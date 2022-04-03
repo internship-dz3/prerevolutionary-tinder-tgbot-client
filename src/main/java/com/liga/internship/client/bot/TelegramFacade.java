@@ -53,7 +53,6 @@ public class TelegramFacade {
                 botState = HANDLER_TINDER;
                 break;
             case USERFORM:
-            case SHOW_PROFILE:
                 botState = SHOW_USER_PROFILE;
                 break;
             case FAVORITES:

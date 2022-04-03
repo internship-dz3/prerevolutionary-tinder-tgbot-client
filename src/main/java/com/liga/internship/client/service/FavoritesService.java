@@ -30,32 +30,6 @@ public class FavoritesService {
         return createPhotoMessageWithInlineKeyBoard(chatId, image, caption, replyKeyboardMarkup);
     }
 
-    public EditMessageMedia getNextPrevInlineKeyboardEditedMessage(long chatId, int messageId, File image, String caption) {
-        final InlineKeyboardMarkup replyKeyboardMarkup = getInlineMenuKeyboard();
-        return createEditedPhotoMessageWithKeyboard(chatId, messageId, image, caption, replyKeyboardMarkup);
-    }
-
-    public SendPhoto getNextPrevInlineKeyboardPhotoMessage(long chatId, File image, String caption) {
-        final InlineKeyboardMarkup replyKeyboardMarkup = getInlineMenuKeyboard();
-        return createPhotoMessageWithInlineKeyBoard(chatId, image, caption, replyKeyboardMarkup);
-    }
-
-    public SendMessage getReplyKeyboardTextMessage(long chatId, String message) {
-        final ReplyKeyboard replyKeyboardMarkup = getReplyKeyboard();
-        return createMessageWithKeyboard(chatId, message, replyKeyboardMarkup);
-    }
-
-    private SendMessage createMessageWithKeyboard(long chatId, String message, ReplyKeyboard replyKeyboardMarkup) {
-        final SendMessage sendMessage = new SendMessage();
-        sendMessage.enableMarkdown(true);
-        sendMessage.setChatId(String.valueOf(chatId));
-        sendMessage.setText(message);
-        if (replyKeyboardMarkup != null) {
-            sendMessage.setReplyMarkup(replyKeyboardMarkup);
-        }
-        return sendMessage;
-    }
-
     private SendPhoto createPhotoMessageWithInlineKeyBoard(long chatId, File image, String caption, ReplyKeyboard replyKeyboardMarkup) {
         return SendPhoto.builder()
                 .photo(new InputFile(image))
@@ -63,6 +37,28 @@ public class FavoritesService {
                 .replyMarkup(replyKeyboardMarkup)
                 .caption(caption)
                 .build();
+    }
+
+    private InlineKeyboardMarkup getInlineOneMenuKeyboard() {
+        final InlineKeyboardMarkup inlineKeyboardMarkup = new InlineKeyboardMarkup();
+        List<List<InlineKeyboardButton>> rowsInline = new ArrayList<>();
+        List<InlineKeyboardButton> menuRow = new ArrayList<>();
+        menuRow.add(getInlineKeyboardButton(ButtonCallback.MENU, ButtonCallback.CALLBACK_MENU));
+        rowsInline.add(menuRow);
+        inlineKeyboardMarkup.setKeyboard(rowsInline);
+        return inlineKeyboardMarkup;
+    }
+
+    private InlineKeyboardButton getInlineKeyboardButton(String buttonText, String buttonCommand) {
+        InlineKeyboardButton inlineKeyboardButton = new InlineKeyboardButton();
+        inlineKeyboardButton.setText(buttonText);
+        inlineKeyboardButton.setCallbackData(buttonCommand);
+        return inlineKeyboardButton;
+    }
+
+    public EditMessageMedia getNextPrevInlineKeyboardEditedMessage(long chatId, int messageId, File image, String caption) {
+        final InlineKeyboardMarkup replyKeyboardMarkup = getInlineMenuKeyboard();
+        return createEditedPhotoMessageWithKeyboard(chatId, messageId, image, caption, replyKeyboardMarkup);
     }
 
     private InlineKeyboardMarkup getInlineMenuKeyboard() {
@@ -91,14 +87,26 @@ public class FavoritesService {
         return editMessageMedia;
     }
 
-    private InlineKeyboardMarkup getInlineOneMenuKeyboard() {
-        final InlineKeyboardMarkup inlineKeyboardMarkup = new InlineKeyboardMarkup();
-        List<List<InlineKeyboardButton>> rowsInline = new ArrayList<>();
-        List<InlineKeyboardButton> menuRow = new ArrayList<>();
-        menuRow.add(getInlineKeyboardButton(ButtonCallback.MENU, ButtonCallback.CALLBACK_MENU));
-        rowsInline.add(menuRow);
-        inlineKeyboardMarkup.setKeyboard(rowsInline);
-        return inlineKeyboardMarkup;
+    public SendPhoto getNextPrevInlineKeyboardPhotoMessage(long chatId, File image, String caption) {
+        final InlineKeyboardMarkup replyKeyboardMarkup = getInlineMenuKeyboard();
+        return createPhotoMessageWithInlineKeyBoard(chatId, image, caption, replyKeyboardMarkup);
+    }
+
+
+    public SendMessage getReplyFavoritesKeyboardTextMessage(long chatId, String message) {
+        final ReplyKeyboard replyKeyboardMarkup = getReplyKeyboard();
+        return createMessageWithFavoritesMenuKeyboard(chatId, message, replyKeyboardMarkup);
+    }
+
+    private SendMessage createMessageWithFavoritesMenuKeyboard(long chatId, String message, ReplyKeyboard replyKeyboardMarkup) {
+        final SendMessage sendMessage = new SendMessage();
+        sendMessage.enableMarkdown(true);
+        sendMessage.setChatId(String.valueOf(chatId));
+        sendMessage.setText(message);
+        if (replyKeyboardMarkup != null) {
+            sendMessage.setReplyMarkup(replyKeyboardMarkup);
+        }
+        return sendMessage;
     }
 
     private ReplyKeyboard getReplyKeyboard() {
@@ -117,12 +125,5 @@ public class FavoritesService {
         keyboard.add(row2);
         replyKeyboardMarkup.setKeyboard(keyboard);
         return replyKeyboardMarkup;
-    }
-
-    private InlineKeyboardButton getInlineKeyboardButton(String buttonText, String buttonCommand) {
-        InlineKeyboardButton inlineKeyboardButton = new InlineKeyboardButton();
-        inlineKeyboardButton.setText(buttonText);
-        inlineKeyboardButton.setCallbackData(buttonCommand);
-        return inlineKeyboardButton;
     }
 }

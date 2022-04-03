@@ -35,7 +35,7 @@ public class ShowProfileHandler implements InputMessageHandler {
         long userId = message.getFrom().getId();
         long chatId = message.getChatId();
         UserProfile userProfile = userDataCache.getUserProfile(userId);
-        File imageWithTextFile = imageCreatorService.getImageWithTextFile(userProfile, userId);
+        File imageWithTextFile = imageCreatorService.getImageWithTextFile(userProfile.getDescription(), userId);
         return showProfileService.getProfileTextMessageWihProfileMenu(chatId, imageWithTextFile, userProfile.getUsername());
     }
 }

@@ -63,14 +63,14 @@ public class TinderHandler implements InputMessageHandler, InputCallbackHandler 
             UserProfile next = notRatedUsers.remove(0);
             tinderDataCache.setUserToVotingProcess(userId, next);
             userDataCache.setUsersCurrentBotState(userId, CONTINUE_VOTING);
-            File imageWithTextFile = imageCreatorService.getImageWithTextFile(next, userId);
+            File imageWithTextFile = imageCreatorService.getImageWithTextFile(next.getDescription(), userId);
             userReply = tinderService.getLikeDislikeMenuPhotoMessage(chatId, imageWithTextFile, next.getUsername());
         } else {
             tinderDataCache.setProcessDataList(userId, notRatedUsers);
             UserProfile next = tinderDataCache.getNext(userId).get();
             tinderDataCache.setUserToVotingProcess(userId, next);
             userDataCache.setUsersCurrentBotState(userId, CONTINUE_VOTING);
-            File imageWithTextFile = imageCreatorService.getImageWithTextFile(next, userId);
+            File imageWithTextFile = imageCreatorService.getImageWithTextFile(next.getDescription(), userId);
             userReply = tinderService.getLikeDislikeMenuPhotoMessage(chatId, imageWithTextFile, next.getUsername());
         }
         return userReply;
@@ -99,7 +99,7 @@ public class TinderHandler implements InputMessageHandler, InputCallbackHandler 
         Optional<UserProfile> next = tinderDataCache.getNext(userId);
         if (next.isPresent()) {
             UserProfile userProfile = next.get();
-            File imageWithTextFile = imageCreatorService.getImageWithTextFile(userProfile, userId);
+            File imageWithTextFile = imageCreatorService.getImageWithTextFile(userProfile.getDescription(), userId);
             tinderDataCache.setUserToVotingProcess(userId, userProfile);
             userDataCache.setUsersCurrentBotState(userId, CONTINUE_VOTING);
             reply = tinderService.getEditedLikeDislikePhotoMessage(chatId, messageId, imageWithTextFile, userProfile.getUsername());

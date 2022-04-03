@@ -51,11 +51,11 @@ public class ImageCreatorService {
             Font headerFont = new Font("Old Standard TT", Font.BOLD, 55);
             Font descriptionFont = new Font("Old Standard TT", Font.PLAIN, 24);
             Rectangle rect = new Rectangle(image.getWidth(), image.getHeight());
-            String headerText = formatted[0].toUpperCase(Locale.ROOT);
             List<AttributedString> attributedStrings = new ArrayList<>();
             for (int i = 0; i < formatted.length; i++) {
                 AttributedString attributedStringLine = new AttributedString(formatted[i]);
                 if (i == 0) {
+                    attributedStringLine = new AttributedString(formatted[i].toUpperCase(Locale.ROOT));
                     attributedStringLine.addAttribute(TextAttribute.FONT, headerFont);
                 } else {
                     attributedStringLine.addAttribute(TextAttribute.FONT, descriptionFont);
@@ -67,10 +67,10 @@ public class ImageCreatorService {
                 g2.setColor(Color.BLACK);
                 float x = 50;
                 List<TextLayout> lines = new ArrayList<>();
-                for (AttributedString attributedString : attributedStrings) {
-                    AttributedCharacterIterator iterator = attributedString.getIterator();
+                for (int i = 0; i < attributedStrings.size(); i++) {
+                    AttributedCharacterIterator iterator = attributedStrings.get(i).getIterator();
                     LineBreakMeasurer measurer = new LineBreakMeasurer(iterator, g2.getFontRenderContext());
-                    while (measurer.getPosition() < headerText.length()) {
+                    while (measurer.getPosition() < formatted[i].length()) {
                         lines.add(measurer.nextLayout((rect.width - x * 2)));
                     }
                 }

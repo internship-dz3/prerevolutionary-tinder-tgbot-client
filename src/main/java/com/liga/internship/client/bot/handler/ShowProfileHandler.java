@@ -15,8 +15,6 @@ import java.io.File;
 import java.util.Optional;
 
 import static com.liga.internship.client.bot.BotState.HANDLER_LOGIN;
-import static com.liga.internship.client.commons.ButtonInput.CHANGE_PROFILE;
-import static com.liga.internship.client.commons.ButtonInput.MAIN_MENU;
 import static com.liga.internship.client.commons.TextMessage.MESSAGE_COMEBACK;
 
 /**
@@ -49,6 +47,6 @@ public class ShowProfileHandler implements InputMessageHandler {
             return mainMenuService.getMainMenuMessage(chatId, MESSAGE_COMEBACK);
         }
         File imageWithTextFile = imageCreatorService.getImageWithTextFile(userProfile, userId);
-        return showProfileService.getMainMenuPhotoMessage(chatId, imageWithTextFile, userProfile.getUsername(), CHANGE_PROFILE, MAIN_MENU);
+        return showProfileService.getProfileTextMessageWihProfileMenu(chatId, imageWithTextFile, userProfile.getUsername());
     }
 }

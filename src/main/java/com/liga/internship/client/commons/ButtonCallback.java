@@ -18,7 +18,6 @@ public class ButtonCallback {
     public static final String CALLBACK_MALE = "MALE";
     public static final String CALLBACK_FEMALE = "FEMALE";
     public static final String CALLBACK_ALL = "ALL";
-    public static final String FILL_FORM = "Заполнить анкету";
 
     private ButtonCallback() {
 

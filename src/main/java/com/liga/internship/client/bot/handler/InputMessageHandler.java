@@ -14,9 +14,9 @@ public interface InputMessageHandler {
     BotState getHandlerName();
 
     /**
-     * Улавливание и обработка callBackQuery телеграм бота
+     * Улавливание и обработка текстовых сообщений телеграм бота
      *
-     * @param message - входящий callBackQuery
+     * @param message - входящее сообщение
      * @return сообщение в виде SendMessage, SendPhoto, EditedMessageMedia
      */
     PartialBotApiMethod<?> handleMessage(Message message);

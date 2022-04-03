@@ -10,7 +10,7 @@ import org.telegram.telegrambots.meta.api.objects.Message;
 import org.telegram.telegrambots.meta.api.objects.Update;
 
 import static com.liga.internship.client.bot.BotState.*;
-import static com.liga.internship.client.commons.TextInput.*;
+import static com.liga.internship.client.commons.ButtonInput.*;
 
 @Slf4j
 @Component
@@ -44,26 +44,25 @@ public class TelegramFacade {
         BotState botState;
         switch (inputMsg) {
             case START:
-                botState = LOGIN;
+                botState = HANDLER_LOGIN;
                 break;
             case CHANGE_PROFILE:
-                botState = FILLING_PROFILE_START;
+                botState = HANDLER_PROFILE_FILLING;
                 break;
             case SEARCH:
-                botState = START_TINDER;
+                botState = HANDLER_TINDER;
                 break;
             case USERFORM:
-            case SHOW_PROFILE:
                 botState = SHOW_USER_PROFILE;
                 break;
             case FAVORITES:
             case FAVORITE:
             case ADMIRER:
             case LOVE:
-                botState = SHOW_USER_FAVORITES;
+                botState = HANDLER_SHOW_FAVORITES;
                 break;
             case MAIN_MENU:
-                botState = SHOW_MAIN_MENU;
+                botState = HANDLER_MAIN_MENU;
                 break;
             default:
                 botState = userDataCache.getUsersCurrentBotState(userId);

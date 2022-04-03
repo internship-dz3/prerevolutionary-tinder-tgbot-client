@@ -2,8 +2,8 @@ package com.liga.internship.client.domain;
 
 import lombok.*;
 
-import static com.liga.internship.client.commons.Button.*;
-import static com.liga.internship.client.commons.TextInput.*;
+import static com.liga.internship.client.commons.ButtonCallback.*;
+import static com.liga.internship.client.commons.ButtonInput.*;
 
 @AllArgsConstructor
 @NoArgsConstructor
@@ -20,7 +20,7 @@ public class UserProfile {
     private String gender;
     private String look;
 
-    public boolean setGender(String gender) {
+    public boolean setGenderByButtonCallback(String gender) {
         switch (gender) {
             case FEMALE:
                 this.gender = CALLBACK_FEMALE;
@@ -33,7 +33,7 @@ public class UserProfile {
         }
     }
 
-    public boolean setLook(String look) {
+    public boolean setLookByButtonCallback(String look) {
         switch (look) {
             case FEMALE:
                 this.look = CALLBACK_FEMALE;

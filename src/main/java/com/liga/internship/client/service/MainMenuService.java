@@ -13,16 +13,16 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
-import static com.liga.internship.client.commons.TextInput.*;
+import static com.liga.internship.client.commons.ButtonInput.*;
 
 @Service
 public class MainMenuService {
     public SendMessage getMainMenuMessage(long chatId, String message) {
         final ReplyKeyboard replyKeyboardMarkup = getMainMenuKeyboard();
-        return createMessageWithKeyboard(chatId, message, replyKeyboardMarkup);
+        return createMessageWithMainMenuKeyboard(chatId, message, replyKeyboardMarkup);
     }
 
-    private SendMessage createMessageWithKeyboard(long chatId, String message, ReplyKeyboard replyKeyboardMarkup) {
+    private SendMessage createMessageWithMainMenuKeyboard(long chatId, String message, ReplyKeyboard replyKeyboardMarkup) {
         final SendMessage sendMessage = new SendMessage();
         sendMessage.enableMarkdown(true);
         sendMessage.setChatId(String.valueOf(chatId));
@@ -38,17 +38,14 @@ public class MainMenuService {
         replyKeyboardMarkup.setSelective(true);
         replyKeyboardMarkup.setResizeKeyboard(true);
         replyKeyboardMarkup.setOneTimeKeyboard(true);
-
         List<KeyboardRow> keyboard = new ArrayList<>();
         KeyboardRow row1 = new KeyboardRow();
         KeyboardRow row2 = new KeyboardRow();
-        KeyboardRow row3 = new KeyboardRow();
         row1.add(new KeyboardButton(SEARCH));
+        row2.add(new KeyboardButton(FAVORITES));
         row2.add(new KeyboardButton(USERFORM));
-        row3.add(new KeyboardButton(FAVORITES));
         keyboard.add(row1);
         keyboard.add(row2);
-        keyboard.add(row3);
         replyKeyboardMarkup.setKeyboard(keyboard);
         return replyKeyboardMarkup;
     }
@@ -66,5 +63,4 @@ public class MainMenuService {
                 .caption(caption)
                 .build();
     }
-
 }

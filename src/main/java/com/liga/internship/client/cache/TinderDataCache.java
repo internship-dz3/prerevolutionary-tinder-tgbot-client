@@ -3,33 +3,70 @@ package com.liga.internship.client.cache;
 import com.liga.internship.client.domain.UserProfile;
 import org.springframework.stereotype.Component;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 
+/**
+ * Данные хранящиеся в памяти для отображения участников голосования, для соответствующего пользователя
+ */
 @Component
 public class TinderDataCache {
     private final Map<Long, List<UserProfile>> listForProcess = new HashMap<>();
     private final Map<Long, UserProfile> usersInProcess = new HashMap<>();
 
-    public List<UserProfile> getProcessDataList(Long userId) {
-        return listForProcess.getOrDefault(userId, new LinkedList<>());
-    }
-
-    public void removeProcessList(Long userId) {
-        listForProcess.remove(userId);
-    }
-
-    public Optional<UserProfile> removeUserFromProcess(Long userId) {
-        if (usersInProcess.containsKey(userId)) {
-            return Optional.of(usersInProcess.remove(userId));
+    /**
+     * Получение следующего опционального пользователя для голосования
+     *
+     * @param userId - ID активного пользователя(голосующего)
+     * @return опциональный пользователь или Optional.empty() при отсутвии
+     */
+    public Optional<UserProfile> getNext(long userId) {
+        if (listForProcess.containsKey(userId)) {
+            List<UserProfile> profileList = listForProcess.get(userId);
+            if (!profileList.isEmpty()) {
+                return Optional.of(profileList.remove(0));
+            }
         }
         return Optional.empty();
     }
 
+    /**
+     * Получение кандидата находящегося в состоянии голосования
+     *
+     * @param userId - ID активного пользователя(голосующего)
+     * @return - кандидат голосования
+     */
+    public UserProfile getUserFromVotingProcess(long userId) {
+        return usersInProcess.remove(userId);
+    }
+
+    /**
+     * Удаление списка голосования из кэша
+     *
+     * @param userId - ID активного пользователя(голосующего)
+     */
+    public void removeProcessList(Long userId) {
+        listForProcess.remove(userId);
+    }
+
+    /**
+     * Внесения списка голосования в кэш
+     *
+     * @param userId - ID активного пользователя(голосующего)
+     * @param userProfiles - список кандидатов голосования
+     */
     public void setProcessDataList(Long userId, List<UserProfile> userProfiles) {
         listForProcess.put(userId, userProfiles);
     }
 
-    public void setToVoting(long userId, UserProfile userInProcess) {
+    /**
+     * Внесение в кэш кандидата голосования
+     * @param userId - ID активного пользователя(голосующего)
+     * @param userInProcess - кандидат голосования
+     */
+    public void setUserToVotingProcess(long userId, UserProfile userInProcess) {
         usersInProcess.put(userId, userInProcess);
     }
 }

@@ -93,7 +93,6 @@ public class ImageCreatorService {
         } catch (IOException e) {
             e.printStackTrace();
         }
-
         return trend;
     }
 

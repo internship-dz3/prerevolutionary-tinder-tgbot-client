@@ -1,6 +1,6 @@
 package com.liga.internship.client.service;
 
-import com.liga.internship.client.commons.Button;
+import com.liga.internship.client.commons.ButtonCallback;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.telegram.telegrambots.meta.api.methods.send.SendPhoto;
@@ -40,10 +40,10 @@ public class TinderService {
         final InlineKeyboardMarkup inlineKeyboardMarkup = new InlineKeyboardMarkup();
         List<List<InlineKeyboardButton>> rowsInline = new ArrayList<>();
         List<InlineKeyboardButton> topRow = new ArrayList<>();
-        topRow.add(getInlineKeyboardButton(Button.BUTTON_DISLIKE, Button.CALLBACK_DISLIKE));
-        topRow.add(getInlineKeyboardButton(Button.BUTTON_LIKE, Button.CALLBACK_LIKE));
+        topRow.add(getInlineKeyboardButton(ButtonCallback.BUTTON_DISLIKE, ButtonCallback.CALLBACK_DISLIKE));
+        topRow.add(getInlineKeyboardButton(ButtonCallback.BUTTON_LIKE, ButtonCallback.CALLBACK_LIKE));
         List<InlineKeyboardButton> menuRow = new ArrayList<>();
-        menuRow.add(getInlineKeyboardButton(Button.MENU, Button.CALLBACK_MENU));
+        menuRow.add(getInlineKeyboardButton(ButtonCallback.MENU, ButtonCallback.CALLBACK_MENU));
         rowsInline.add(topRow);
         rowsInline.add(menuRow);
         inlineKeyboardMarkup.setKeyboard(rowsInline);

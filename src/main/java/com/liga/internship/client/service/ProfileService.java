@@ -24,7 +24,7 @@ public class ProfileService {
     }
 
     private ReplyKeyboardMarkup genderChooseMenuKeyboard() {
-        final ReplyKeyboardMarkup replyKeyboardMarkup = getReplyKeyboardMarkup();
+        final ReplyKeyboardMarkup replyKeyboardMarkup = getReplyKeyboardMarkup(true);
         List<KeyboardRow> keyboard = new ArrayList<>();
         KeyboardRow row1 = new KeyboardRow();
         KeyboardRow row2 = new KeyboardRow();
@@ -42,7 +42,7 @@ public class ProfileService {
     }
 
     private ReplyKeyboardMarkup lookGenderChooseKeyboard() {
-        final ReplyKeyboardMarkup replyKeyboardMarkup = getReplyKeyboardMarkup();
+        final ReplyKeyboardMarkup replyKeyboardMarkup = getReplyKeyboardMarkup(true);
         List<KeyboardRow> keyboard = new ArrayList<>();
         KeyboardRow row1 = new KeyboardRow();
         KeyboardRow row2 = new KeyboardRow();
@@ -55,11 +55,11 @@ public class ProfileService {
         return replyKeyboardMarkup;
     }
 
-    private ReplyKeyboardMarkup getReplyKeyboardMarkup() {
+    private ReplyKeyboardMarkup getReplyKeyboardMarkup(boolean oneTime) {
         final ReplyKeyboardMarkup replyKeyboardMarkup = new ReplyKeyboardMarkup();
         replyKeyboardMarkup.setSelective(true);
         replyKeyboardMarkup.setResizeKeyboard(true);
-        replyKeyboardMarkup.setOneTimeKeyboard(true);
+        replyKeyboardMarkup.setOneTimeKeyboard(oneTime);
         return replyKeyboardMarkup;
     }
 
@@ -80,11 +80,11 @@ public class ProfileService {
     }
 
     private ReplyKeyboardMarkup getProfileMenuKeyboard() {
-        final ReplyKeyboardMarkup replyKeyboardMarkup = getReplyKeyboardMarkup();
+        final ReplyKeyboardMarkup replyKeyboardMarkup = getReplyKeyboardMarkup(false);
         List<KeyboardRow> keyboard = new ArrayList<>();
         KeyboardRow row1 = new KeyboardRow();
         KeyboardRow row2 = new KeyboardRow();
-        row1.add(new KeyboardButton(ButtonInput.SHOW_PROFILE));
+        row1.add(new KeyboardButton(CHANGE_PROFILE));
         row2.add(new KeyboardButton(ButtonInput.MAIN_MENU));
         keyboard.add(row1);
         keyboard.add(row2);

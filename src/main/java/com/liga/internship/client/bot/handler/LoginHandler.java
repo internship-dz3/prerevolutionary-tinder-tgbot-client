@@ -47,12 +47,14 @@ public class LoginHandler implements InputMessageHandler, InputCallbackHandler {
     private SendMessage getSendMessage(long userId, long chatId) {
         Optional<UserProfile> userProfile = v1RestService.userLogin(userId);
         if (userProfile.isPresent()) {
-            userDataCache.setUsersCurrentBotState(userId, HANDLER_MAIN_MENU);
             userDataCache.saveUserProfile(userId, userProfile.get());
+            userDataCache.setLoginUser(userId, true);
+            userDataCache.setUsersCurrentBotState(userId, HANDLER_MAIN_MENU);
             return mainMenuService.getMainMenuMessage(chatId, MESSAGE_MAIN_MENU);
+        } else {
+            userDataCache.setUsersCurrentBotState(userId, HANDLER_PROFILE_FILLING);
+            return loginService.getMEssageWithFillFormMenu(chatId, MESSAGE_WELCOME);
         }
-        userDataCache.setUsersCurrentBotState(userId, HANDLER_PROFILE_FILLING);
-        return loginService.getMEssageWithFillFormMenu(chatId, MESSAGE_WELCOME);
     }
 
     @Override

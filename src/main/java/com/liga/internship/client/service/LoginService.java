@@ -32,7 +32,7 @@ public class LoginService {
         final ReplyKeyboardMarkup replyKeyboardMarkup = new ReplyKeyboardMarkup();
         replyKeyboardMarkup.setSelective(true);
         replyKeyboardMarkup.setResizeKeyboard(true);
-        replyKeyboardMarkup.setOneTimeKeyboard(true);
+        replyKeyboardMarkup.setOneTimeKeyboard(false);
         return replyKeyboardMarkup;
     }
 

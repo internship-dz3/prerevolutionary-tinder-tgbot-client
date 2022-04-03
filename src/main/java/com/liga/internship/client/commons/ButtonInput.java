@@ -12,7 +12,6 @@ public class ButtonInput {
     public static final String USERFORM = "Анкета";
     public static final String FAVORITES = "Любимцы";
     public static final String CHANGE_PROFILE = "Изменить";
-    public static final String SHOW_PROFILE = "Показать мою анкету";
     public static final String MAIN_MENU = "Главное меню";
     public static final String FAVORITE = "Мои любимцы";
     public static final String ADMIRER = "Я любимец";

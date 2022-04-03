@@ -14,7 +14,6 @@ import java.io.File;
 import java.util.Optional;
 
 import static com.liga.internship.client.bot.BotState.*;
-import static com.liga.internship.client.commons.ButtonInput.*;
 import static com.liga.internship.client.commons.TextMessage.*;
 
 /**
@@ -63,8 +62,7 @@ public class FillProfileHandler implements InputMessageHandler {
 
         if (botState.equals(FILLING_PROFILE_ASK_GENDER)) {
             userProfile.setTelegramId(userId);
-            String[] buttons = {MALE, FEMALE};
-            replyToUser = profileService.getChooseButtons(chatId, MESSAGE_CHOOSE_YOUR_GENDER, buttons);
+            replyToUser = profileService.getMessageWithGenderChooseKeyboard(chatId, MESSAGE_CHOOSE_YOUR_GENDER);
             userDataCache.setUsersCurrentBotState(userId, FILLING_PROFILE_ASK_NAME);
         }
         if (botState.equals(FILLING_PROFILE_ASK_NAME)) {
@@ -72,8 +70,7 @@ public class FillProfileHandler implements InputMessageHandler {
                 replyToUser = replyMessageService.getReplyMessage(chatId, MESSAGE_ENTER_YOUR_NAME);
                 userDataCache.setUsersCurrentBotState(userId, FILLING_PROFILE_ASK_DESCRIBE);
             } else {
-                String[] buttons = {MALE, FEMALE};
-                replyToUser = profileService.getChooseButtons(chatId, MESSAGE_CHOOSE_YOUR_GENDER, buttons);
+                replyToUser = profileService.getMessageWithGenderChooseKeyboard(chatId, MESSAGE_CHOOSE_YOUR_GENDER);
                 userDataCache.setUsersCurrentBotState(userId, FILLING_PROFILE_ASK_NAME);
             }
         }
@@ -84,8 +81,7 @@ public class FillProfileHandler implements InputMessageHandler {
         }
         if (botState.equals(FILLING_PROFILE_ASK_LOOK)) {
             userProfile.setDescription(userAnswer);
-            String[] buttons = {MALE, FEMALE, ALL};
-            replyToUser = profileService.getChooseButtons(chatId, MESSAGE_LOOKFOR, buttons);
+            replyToUser = profileService.getMessageWithgetLookGenderChooseKeyboard(chatId, MESSAGE_LOOKFOR);
             userDataCache.setUsersCurrentBotState(userId, FILLING_PROFILE_COMPLETE);
         }
         if (botState.equals(FILLING_PROFILE_COMPLETE)) {
@@ -103,8 +99,7 @@ public class FillProfileHandler implements InputMessageHandler {
                 }
                 userDataCache.setUsersCurrentBotState(userId, HANDLER_MAIN_MENU);
             } else {
-                String[] buttons = {MALE, FEMALE, ALL};
-                replyToUser = profileService.getChooseButtons(chatId, MESSAGE_LOOKFOR, buttons);
+                replyToUser = profileService.getMessageWithgetLookGenderChooseKeyboard(chatId, MESSAGE_LOOKFOR);
                 userDataCache.setUsersCurrentBotState(userId, FILLING_PROFILE_COMPLETE);
             }
         }

@@ -55,8 +55,6 @@ public class TelegramFacade {
         BotState botState;
         switch (inputMsg) {
             case START:
-                botState = HANDLER_LOGIN;
-                break;
             case CHANGE_PROFILE:
                 botState = HANDLER_PROFILE_FILLING;
                 break;

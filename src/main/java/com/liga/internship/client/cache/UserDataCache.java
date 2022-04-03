@@ -6,7 +6,6 @@ import org.springframework.stereotype.Component;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Optional;
 
 /**
  * Данные хранящиеся в памяти для хранения активных пользователей и хранения их состояния
@@ -15,6 +14,7 @@ import java.util.Optional;
 public class UserDataCache {
     private final Map<Long, BotState> userBotStates = new HashMap<>();
     private final Map<Long, UserProfile> userProfileMap = new HashMap<>();
+    private final Map<Long, Boolean> isLogged = new HashMap<>();
 
     /**
      * Получение опционального пользователя
@@ -22,12 +22,12 @@ public class UserDataCache {
      * @param userId - ID юзера
      * @return Optional.empty() если данный пользватель отсутствует в кэше
      */
-    public Optional<UserProfile> getUserProfile(long userId) {
-        UserProfile userProfileData = userProfileMap.get(userId);
-        if (userProfileData == null) {
-            return Optional.empty();
+    public UserProfile getUserProfile(long userId) {
+        UserProfile activeUserProfile = userProfileMap.get(userId);
+        if (activeUserProfile == null) {
+            return new UserProfile();
         }
-        return Optional.of(userProfileData);
+        return activeUserProfile;
     }
 
     /**
@@ -44,6 +44,10 @@ public class UserDataCache {
         return botState;
     }
 
+    public boolean isLoggedIn(long userId) {
+        return isLogged.get(userId) != null && isLogged.get(userId);
+    }
+
     /**
      * Сохранение активного пользователя в кэш
      *
@@ -52,6 +56,10 @@ public class UserDataCache {
      */
     public void saveUserProfile(long userId, UserProfile userProfile) {
         userProfileMap.put(userId, userProfile);
+    }
+
+    public void setLoginUser(long userId, boolean isLogedIn) {
+        isLogged.put(userId, isLogedIn);
     }
 
     /**
@@ -63,4 +71,5 @@ public class UserDataCache {
     public void setUsersCurrentBotState(long userId, BotState botState) {
         userBotStates.put(userId, botState);
     }
+
 }

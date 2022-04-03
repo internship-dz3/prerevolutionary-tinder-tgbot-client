@@ -1,6 +1,8 @@
 package com.liga.internship.client.bot.handler;
 
 import com.liga.internship.client.bot.BotState;
+import com.liga.internship.client.bot.handler.InputCallbackHandler;
+import com.liga.internship.client.bot.handler.InputMessageHandler;
 import com.liga.internship.client.cache.UserDataCache;
 import com.liga.internship.client.domain.UserProfile;
 import com.liga.internship.client.service.LoginService;
@@ -49,6 +51,7 @@ public class LoginHandler implements InputMessageHandler, InputCallbackHandler {
         if (userProfile.isPresent()) {
             userDataCache.setUsersCurrentBotState(userId, HANDLER_MAIN_MENU);
             userDataCache.saveUserProfile(userId, userProfile.get());
+            userDataCache.setLoginUser(userId, true);
             return mainMenuService.getMainMenuMessage(chatId, MESSAGE_MAIN_MENU);
         }
         userDataCache.setUsersCurrentBotState(userId, HANDLER_PROFILE_FILLING);

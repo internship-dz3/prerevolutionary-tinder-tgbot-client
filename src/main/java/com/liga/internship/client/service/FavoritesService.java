@@ -113,7 +113,7 @@ public class FavoritesService {
         final ReplyKeyboardMarkup replyKeyboardMarkup = new ReplyKeyboardMarkup();
         replyKeyboardMarkup.setSelective(true);
         replyKeyboardMarkup.setResizeKeyboard(true);
-        replyKeyboardMarkup.setOneTimeKeyboard(true);
+        replyKeyboardMarkup.setOneTimeKeyboard(false);
         List<KeyboardRow> keyboard = new ArrayList<>();
         KeyboardRow row1 = new KeyboardRow();
         KeyboardRow row2 = new KeyboardRow();

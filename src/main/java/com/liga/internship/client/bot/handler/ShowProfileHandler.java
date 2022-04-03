@@ -12,10 +12,6 @@ import org.telegram.telegrambots.meta.api.methods.PartialBotApiMethod;
 import org.telegram.telegrambots.meta.api.objects.Message;
 
 import java.io.File;
-import java.util.Optional;
-
-import static com.liga.internship.client.bot.BotState.HANDLER_LOGIN;
-import static com.liga.internship.client.commons.TextMessage.MESSAGE_COMEBACK;
 
 /**
  * Обработчик входящих Messageсообщений телеграм бота, связанных с просмотром профиля пользователя и соответствующего меню.
@@ -38,14 +34,7 @@ public class ShowProfileHandler implements InputMessageHandler {
     public PartialBotApiMethod<?> handleMessage(Message message) {
         long userId = message.getFrom().getId();
         long chatId = message.getChatId();
-        Optional<UserProfile> optionalUserProfile = userDataCache.getUserProfile(userId);
-        UserProfile userProfile;
-        if (optionalUserProfile.isPresent()) {
-            userProfile = optionalUserProfile.get();
-        } else {
-            userDataCache.setUsersCurrentBotState(userId, HANDLER_LOGIN);
-            return mainMenuService.getMainMenuMessage(chatId, MESSAGE_COMEBACK);
-        }
+        UserProfile userProfile = userDataCache.getUserProfile(userId);
         File imageWithTextFile = imageCreatorService.getImageWithTextFile(userProfile, userId);
         return showProfileService.getProfileTextMessageWihProfileMenu(chatId, imageWithTextFile, userProfile.getUsername());
     }

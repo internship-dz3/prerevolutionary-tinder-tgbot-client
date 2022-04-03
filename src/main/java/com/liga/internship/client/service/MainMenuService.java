@@ -34,10 +34,7 @@ public class MainMenuService {
     }
 
     private ReplyKeyboard getMainMenuKeyboard() {
-        final ReplyKeyboardMarkup replyKeyboardMarkup = new ReplyKeyboardMarkup();
-        replyKeyboardMarkup.setSelective(true);
-        replyKeyboardMarkup.setResizeKeyboard(true);
-        replyKeyboardMarkup.setOneTimeKeyboard(true);
+        final ReplyKeyboardMarkup replyKeyboardMarkup = getReplyKeyboardMarkup();
         List<KeyboardRow> keyboard = new ArrayList<>();
         KeyboardRow row1 = new KeyboardRow();
         KeyboardRow row2 = new KeyboardRow();
@@ -47,6 +44,14 @@ public class MainMenuService {
         keyboard.add(row1);
         keyboard.add(row2);
         replyKeyboardMarkup.setKeyboard(keyboard);
+        return replyKeyboardMarkup;
+    }
+
+    private ReplyKeyboardMarkup getReplyKeyboardMarkup() {
+        final ReplyKeyboardMarkup replyKeyboardMarkup = new ReplyKeyboardMarkup();
+        replyKeyboardMarkup.setSelective(true);
+        replyKeyboardMarkup.setResizeKeyboard(true);
+        replyKeyboardMarkup.setOneTimeKeyboard(false);
         return replyKeyboardMarkup;
     }
 

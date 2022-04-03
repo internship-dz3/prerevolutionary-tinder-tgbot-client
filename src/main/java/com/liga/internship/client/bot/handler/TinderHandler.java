@@ -3,12 +3,10 @@ package com.liga.internship.client.bot.handler;
 import com.liga.internship.client.bot.BotState;
 import com.liga.internship.client.cache.TinderDataCache;
 import com.liga.internship.client.cache.UserDataCache;
+import com.liga.internship.client.commons.ButtonInput;
 import com.liga.internship.client.domain.UserProfile;
 import com.liga.internship.client.domain.dto.UsersIdTo;
-import com.liga.internship.client.service.ImageCreatorService;
-import com.liga.internship.client.service.MainMenuService;
-import com.liga.internship.client.service.TinderService;
-import com.liga.internship.client.service.V1RestService;
+import com.liga.internship.client.service.*;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
@@ -22,7 +20,9 @@ import java.util.Optional;
 
 import static com.liga.internship.client.bot.BotState.*;
 import static com.liga.internship.client.commons.ButtonCallback.*;
-import static com.liga.internship.client.commons.TextMessage.*;
+import static com.liga.internship.client.commons.ButtonInput.*;
+import static com.liga.internship.client.commons.TextMessage.MESSAGE_COMEBACK_LATER;
+import static com.liga.internship.client.commons.TextMessage.MESSAGE_MAIN_MENU;
 
 /**
  * Обработчик входящих Message и CallbackQuery сообщений телеграм бота, связанных с голосованием.
@@ -38,6 +38,7 @@ public class TinderHandler implements InputMessageHandler, InputCallbackHandler 
     private final MainMenuService mainMenuService;
     private final TinderDataCache tinderDataCache;
     private final V1RestService v1RestService;
+    private final TextService textService;
 
     @Override
     public BotState getHandlerName() {
@@ -52,14 +53,7 @@ public class TinderHandler implements InputMessageHandler, InputCallbackHandler 
     }
 
     private PartialBotApiMethod<?> startVoting(long userId, long chatId) {
-        Optional<UserProfile> optionalUserProfile = userDataCache.getUserProfile(userId);
-        UserProfile userProfile;
-        if (optionalUserProfile.isPresent()) {
-            userProfile = optionalUserProfile.get();
-        } else {
-            userDataCache.setUsersCurrentBotState(userId, HANDLER_LOGIN);
-            return mainMenuService.getMainMenuMessage(chatId, MESSAGE_COMEBACK);
-        }
+        UserProfile userProfile = userDataCache.getUserProfile(userId);
         List<UserProfile> notRatedUsers = v1RestService.getNotRatedUsers(userProfile);
         PartialBotApiMethod<?> userReply;
         if (notRatedUsers.isEmpty()) {
@@ -69,17 +63,23 @@ public class TinderHandler implements InputMessageHandler, InputCallbackHandler 
             UserProfile next = notRatedUsers.remove(0);
             tinderDataCache.setUserToVotingProcess(userId, next);
             userDataCache.setUsersCurrentBotState(userId, CONTINUE_VOTING);
-            File imageWithTextFile = imageCreatorService.getImageWithTextFile(next, userId);
-            userReply = tinderService.getLikeDislikeMenuPhotoMessage(chatId, imageWithTextFile, next.getUsername());
+            File imageWithTextFile = imageCreatorService.getImageWithTextFile(next.getDescription(), userId);
+            userReply = tinderService.getLikeDislikeMenuPhotoMessage(chatId, imageWithTextFile, getCaptureFromUserProfile(next));
         } else {
             tinderDataCache.setProcessDataList(userId, notRatedUsers);
             UserProfile next = tinderDataCache.getNext(userId).get();
             tinderDataCache.setUserToVotingProcess(userId, next);
             userDataCache.setUsersCurrentBotState(userId, CONTINUE_VOTING);
-            File imageWithTextFile = imageCreatorService.getImageWithTextFile(next, userId);
-            userReply = tinderService.getLikeDislikeMenuPhotoMessage(chatId, imageWithTextFile, next.getUsername());
+            File imageWithTextFile = imageCreatorService.getImageWithTextFile(next.getDescription(), userId);
+            userReply = tinderService.getLikeDislikeMenuPhotoMessage(chatId, imageWithTextFile, getCaptureFromUserProfile(next));
         }
         return userReply;
+    }
+
+    private String getCaptureFromUserProfile(UserProfile userProfile) {
+        String gender = userProfile.getGender().equals(CALLBACK_MALE) ? MALE : CALLBACK_FEMALE;
+        String username = textService.translateTextIntoSlavOld(userProfile.getUsername());
+        return String.format("%s, %s", gender, username);
     }
 
     @Override
@@ -88,14 +88,7 @@ public class TinderHandler implements InputMessageHandler, InputCallbackHandler 
         long userId = callbackQuery.getFrom().getId();
         long chatId = callbackQuery.getMessage().getChatId();
         int messageId = callbackQuery.getMessage().getMessageId();
-        Optional<UserProfile> optionalUserProfile = userDataCache.getUserProfile(userId);
-        UserProfile currentUser;
-        if (optionalUserProfile.isPresent()) {
-            currentUser = optionalUserProfile.get();
-        } else {
-            userDataCache.setUsersCurrentBotState(userId, HANDLER_LOGIN);
-            return mainMenuService.getMainMenuMessage(chatId, MESSAGE_COMEBACK);
-        }
+        UserProfile currentUser = userDataCache.getUserProfile(userId);
         PartialBotApiMethod<?> reply;
         if (callbackQueryData.equals(CALLBACK_MENU)) {
             userDataCache.setUsersCurrentBotState(userId, HANDLER_MAIN_MENU);
@@ -112,10 +105,10 @@ public class TinderHandler implements InputMessageHandler, InputCallbackHandler 
         Optional<UserProfile> next = tinderDataCache.getNext(userId);
         if (next.isPresent()) {
             UserProfile userProfile = next.get();
-            File imageWithTextFile = imageCreatorService.getImageWithTextFile(userProfile, userId);
+            File imageWithTextFile = imageCreatorService.getImageWithTextFile(userProfile.getDescription(), userId);
             tinderDataCache.setUserToVotingProcess(userId, userProfile);
             userDataCache.setUsersCurrentBotState(userId, CONTINUE_VOTING);
-            reply = tinderService.getEditedLikeDislikePhotoMessage(chatId, messageId, imageWithTextFile, userProfile.getUsername());
+            reply = tinderService.getEditedLikeDislikePhotoMessage(chatId, messageId, imageWithTextFile, getCaptureFromUserProfile(userProfile));
         } else {
             reply = startVoting(userId, chatId);
         }

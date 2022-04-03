@@ -25,7 +25,6 @@ public class TelegramFacade {
         if (message != null && message.hasText()) {
             sendMessage = handleInputMessage(message);
         }
-
         if (update.hasCallbackQuery()) {
             CallbackQuery callbackQuery = update.getCallbackQuery();
             sendMessage = handleCallbackQuery(callbackQuery);
@@ -42,10 +41,20 @@ public class TelegramFacade {
         String inputMsg = message.getText();
         long userId = message.getFrom().getId();
         BotState botState;
+        boolean isActive = userDataCache.isLoggedIn(userId);
+        if(!isActive) {
+            botState = userDataCache.getUsersCurrentBotState(userId);
+        } else {
+            botState = getBotState(inputMsg, userId);
+        }
+        userDataCache.setUsersCurrentBotState(userId, botState);
+        return botStateContext.processInputMessage(botState, message);
+    }
+
+    private BotState getBotState(String inputMsg, long userId) {
+        BotState botState;
         switch (inputMsg) {
             case START:
-                botState = HANDLER_LOGIN;
-                break;
             case CHANGE_PROFILE:
                 botState = HANDLER_PROFILE_FILLING;
                 break;
@@ -68,7 +77,6 @@ public class TelegramFacade {
                 botState = userDataCache.getUsersCurrentBotState(userId);
                 break;
         }
-        userDataCache.setUsersCurrentBotState(userId, botState);
-        return botStateContext.processInputMessage(botState, message);
+        return botState;
     }
 }

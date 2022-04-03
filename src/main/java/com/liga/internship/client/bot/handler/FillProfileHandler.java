@@ -14,6 +14,9 @@ import java.io.File;
 import java.util.Optional;
 
 import static com.liga.internship.client.bot.BotState.*;
+import static com.liga.internship.client.commons.ButtonCallback.CALLBACK_FEMALE;
+import static com.liga.internship.client.commons.ButtonCallback.CALLBACK_MALE;
+import static com.liga.internship.client.commons.ButtonInput.MALE;
 import static com.liga.internship.client.commons.TextMessage.*;
 
 /**
@@ -30,6 +33,7 @@ public class FillProfileHandler implements InputMessageHandler {
     private final V1RestService v1RestService;
     private final ImageCreatorService imageCreatorService;
     private final MainMenuService mainMenuService;
+    private final TextService textService;
 
     @Override
     public BotState getHandlerName() {
@@ -49,16 +53,10 @@ public class FillProfileHandler implements InputMessageHandler {
         String userAnswer = message.getText();
         long userId = message.getFrom().getId();
         long chatId = message.getChatId();
-        Optional<UserProfile> optionalUserProfile = userDataCache.getUserProfile(userId);
-        UserProfile userProfile;
-        if (optionalUserProfile.isPresent()) {
-            userProfile = optionalUserProfile.get();
-        } else {
-            userDataCache.setUsersCurrentBotState(userId, HANDLER_LOGIN);
-            return mainMenuService.getMainMenuMessage(chatId, MESSAGE_COMEBACK);
-        }
+        UserProfile userProfile = userDataCache.getUserProfile(userId);
         BotState botState = userDataCache.getUsersCurrentBotState(userId);
         PartialBotApiMethod<?> replyToUser = null;
+        File imageWithTextFile;
 
         if (botState.equals(FILLING_PROFILE_ASK_GENDER)) {
             userProfile.setTelegramId(userId);
@@ -66,13 +64,7 @@ public class FillProfileHandler implements InputMessageHandler {
             userDataCache.setUsersCurrentBotState(userId, FILLING_PROFILE_ASK_NAME);
         }
         if (botState.equals(FILLING_PROFILE_ASK_NAME)) {
-            if (userProfile.setGenderByButtonCallback(userAnswer)) {
-                replyToUser = replyMessageService.getReplyMessage(chatId, MESSAGE_ENTER_YOUR_NAME);
-                userDataCache.setUsersCurrentBotState(userId, FILLING_PROFILE_ASK_DESCRIBE);
-            } else {
-                replyToUser = profileService.getMessageWithGenderChooseKeyboard(chatId, MESSAGE_CHOOSE_YOUR_GENDER);
-                userDataCache.setUsersCurrentBotState(userId, FILLING_PROFILE_ASK_NAME);
-            }
+            replyToUser = getMessageReplyForAskName(userAnswer, userId, chatId, userProfile);
         }
         if (botState.equals(FILLING_PROFILE_ASK_DESCRIBE)) {
             userProfile.setUsername(userAnswer);
@@ -86,25 +78,48 @@ public class FillProfileHandler implements InputMessageHandler {
         }
         if (botState.equals(FILLING_PROFILE_COMPLETE)) {
             if (userProfile.setLookByButtonCallback(userAnswer)) {
-                File imageWithTextFile = imageCreatorService.getImageWithTextFile(userProfile, userId);
-                replyToUser = mainMenuService.getMainMenuPhotoMessage(chatId, imageWithTextFile, userProfile.getUsername());
-                if (userProfile.getId() != null) {
-                    v1RestService.updateUser(userProfile);
-                } else {
-                    Optional<UserProfile> optionalNewUser = v1RestService.registerNewUser(userProfile);
-                    if (optionalNewUser.isPresent()) {
-                        userDataCache.setUsersCurrentBotState(userId, HANDLER_LOGIN);
-                        return mainMenuService.getMainMenuMessage(chatId, MESSAGE_COMEBACK);
-                    }
-                }
+                userProfile = getRegisteredUserProfile(userProfile);
+                imageWithTextFile = imageCreatorService.getImageWithTextFile(userProfile.getDescription(), userId);
+                replyToUser = mainMenuService.getMainMenuPhotoMessage(chatId, imageWithTextFile, getCaptureFromUserProfile(userProfile));
                 userDataCache.setUsersCurrentBotState(userId, HANDLER_MAIN_MENU);
             } else {
                 replyToUser = profileService.getMessageWithgetLookGenderChooseKeyboard(chatId, MESSAGE_LOOKFOR);
                 userDataCache.setUsersCurrentBotState(userId, FILLING_PROFILE_COMPLETE);
             }
         }
-
         userDataCache.saveUserProfile(userId, userProfile);
         return replyToUser;
+    }
+
+    private PartialBotApiMethod<?> getMessageReplyForAskName(String userAnswer, long userId, long chatId, UserProfile userProfile) {
+        PartialBotApiMethod<?> replyToUser;
+        if (userProfile.setGenderByButtonCallback(userAnswer)) {
+            replyToUser = replyMessageService.getReplyMessage(chatId, MESSAGE_ENTER_YOUR_NAME);
+            userDataCache.setUsersCurrentBotState(userId, FILLING_PROFILE_ASK_DESCRIBE);
+        } else {
+            replyToUser = profileService.getMessageWithGenderChooseKeyboard(chatId, MESSAGE_CHOOSE_YOUR_GENDER);
+            userDataCache.setUsersCurrentBotState(userId, FILLING_PROFILE_ASK_NAME);
+        }
+        return replyToUser;
+    }
+
+    private UserProfile getRegisteredUserProfile(UserProfile userProfile) {
+        if (userProfile.getId() != null) {
+            v1RestService.updateUser(userProfile);
+        } else {
+            Optional<UserProfile> optionalNewUser = v1RestService.registerNewUser(userProfile);
+            if (optionalNewUser.isPresent()) {
+                userProfile = optionalNewUser.get();
+            } else {
+                throw new RuntimeException("user not found");
+            }
+        }
+        return userProfile;
+    }
+
+    private String getCaptureFromUserProfile(UserProfile userProfile) {
+        String gender = userProfile.getGender().equals(CALLBACK_MALE) ? MALE : CALLBACK_FEMALE;
+        String username = textService.translateTextIntoSlavOld(userProfile.getUsername());
+        return String.format("%s, %s", gender, username);
     }
 }

@@ -3,12 +3,10 @@ package com.liga.internship.client.bot.handler;
 import com.liga.internship.client.bot.BotState;
 import com.liga.internship.client.cache.TinderDataCache;
 import com.liga.internship.client.cache.UserDataCache;
+import com.liga.internship.client.commons.ButtonInput;
 import com.liga.internship.client.domain.UserProfile;
 import com.liga.internship.client.domain.dto.UsersIdTo;
-import com.liga.internship.client.service.ImageCreatorService;
-import com.liga.internship.client.service.MainMenuService;
-import com.liga.internship.client.service.TinderService;
-import com.liga.internship.client.service.V1RestService;
+import com.liga.internship.client.service.*;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
@@ -22,6 +20,7 @@ import java.util.Optional;
 
 import static com.liga.internship.client.bot.BotState.*;
 import static com.liga.internship.client.commons.ButtonCallback.*;
+import static com.liga.internship.client.commons.ButtonInput.*;
 import static com.liga.internship.client.commons.TextMessage.MESSAGE_COMEBACK_LATER;
 import static com.liga.internship.client.commons.TextMessage.MESSAGE_MAIN_MENU;
 
@@ -39,6 +38,7 @@ public class TinderHandler implements InputMessageHandler, InputCallbackHandler 
     private final MainMenuService mainMenuService;
     private final TinderDataCache tinderDataCache;
     private final V1RestService v1RestService;
+    private final TextService textService;
 
     @Override
     public BotState getHandlerName() {
@@ -64,16 +64,22 @@ public class TinderHandler implements InputMessageHandler, InputCallbackHandler 
             tinderDataCache.setUserToVotingProcess(userId, next);
             userDataCache.setUsersCurrentBotState(userId, CONTINUE_VOTING);
             File imageWithTextFile = imageCreatorService.getImageWithTextFile(next.getDescription(), userId);
-            userReply = tinderService.getLikeDislikeMenuPhotoMessage(chatId, imageWithTextFile, next.getUsername());
+            userReply = tinderService.getLikeDislikeMenuPhotoMessage(chatId, imageWithTextFile, getCaptureFromUserProfile(next));
         } else {
             tinderDataCache.setProcessDataList(userId, notRatedUsers);
             UserProfile next = tinderDataCache.getNext(userId).get();
             tinderDataCache.setUserToVotingProcess(userId, next);
             userDataCache.setUsersCurrentBotState(userId, CONTINUE_VOTING);
             File imageWithTextFile = imageCreatorService.getImageWithTextFile(next.getDescription(), userId);
-            userReply = tinderService.getLikeDislikeMenuPhotoMessage(chatId, imageWithTextFile, next.getUsername());
+            userReply = tinderService.getLikeDislikeMenuPhotoMessage(chatId, imageWithTextFile, getCaptureFromUserProfile(next));
         }
         return userReply;
+    }
+
+    private String getCaptureFromUserProfile(UserProfile userProfile) {
+        String gender = userProfile.getGender().equals(CALLBACK_MALE) ? MALE : CALLBACK_FEMALE;
+        String username = textService.translateTextIntoSlavOld(userProfile.getUsername());
+        return String.format("%s, %s", gender, username);
     }
 
     @Override
@@ -102,7 +108,7 @@ public class TinderHandler implements InputMessageHandler, InputCallbackHandler 
             File imageWithTextFile = imageCreatorService.getImageWithTextFile(userProfile.getDescription(), userId);
             tinderDataCache.setUserToVotingProcess(userId, userProfile);
             userDataCache.setUsersCurrentBotState(userId, CONTINUE_VOTING);
-            reply = tinderService.getEditedLikeDislikePhotoMessage(chatId, messageId, imageWithTextFile, userProfile.getUsername());
+            reply = tinderService.getEditedLikeDislikePhotoMessage(chatId, messageId, imageWithTextFile, getCaptureFromUserProfile(userProfile));
         } else {
             reply = startVoting(userId, chatId);
         }

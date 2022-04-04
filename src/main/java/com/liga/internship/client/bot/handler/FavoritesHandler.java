@@ -109,6 +109,7 @@ public class FavoritesHandler implements InputCallbackHandler, InputMessageHandl
             replyMessage = favoritesService.getMenuInlineKeyBoardService(chatId, imageWithTextFile, messageCaption);
         } else if (favoritesList.isEmpty()) {
             replyMessage = favoritesService.getReplyFavoritesKeyboardTextMessage(chatId, MESSAGE_EMPTY);
+
         } else {
             favoritesDataCache.setProcessDataList(userId, favoritesList);
             UserProfile showFirst = favoritesDataCache.getNextUser(userId);
@@ -118,9 +119,9 @@ public class FavoritesHandler implements InputCallbackHandler, InputMessageHandl
         }
 
         if (userButtonInput.equals(FAVORITES)) {
-            userDataCache.setUsersCurrentBotState(userId, HANDLER_SHOW_FAVORITES);
             replyMessage = favoritesService.getReplyFavoritesKeyboardTextMessage(chatId, MESSAGE_FAVORITE);
         }
+        userDataCache.setUsersCurrentBotState(userId, HANDLER_SHOW_FAVORITES);
         return replyMessage;
     }
 

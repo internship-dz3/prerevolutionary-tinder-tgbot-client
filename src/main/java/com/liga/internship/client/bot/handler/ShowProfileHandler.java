@@ -40,6 +40,7 @@ public class ShowProfileHandler implements InputMessageHandler {
         long chatId = message.getChatId();
         UserProfile userProfile = userDataCache.getUserProfile(userId);
         File imageWithTextFile = imageCreatorService.getImageWithTextFile(userProfile.getDescription(), userId);
+        userDataCache.setUsersCurrentBotState(userId, BotState.SHOW_USER_PROFILE);
         return showProfileService.getProfileTextMessageWihProfileMenu(chatId, imageWithTextFile, getCaptureFromUserProfile(userProfile));
     }
 

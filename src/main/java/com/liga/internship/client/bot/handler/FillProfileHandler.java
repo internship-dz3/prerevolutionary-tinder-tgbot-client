@@ -14,8 +14,8 @@ import java.io.File;
 import java.util.Optional;
 
 import static com.liga.internship.client.bot.BotState.*;
-import static com.liga.internship.client.commons.ButtonCallback.CALLBACK_FEMALE;
 import static com.liga.internship.client.commons.ButtonCallback.CALLBACK_MALE;
+import static com.liga.internship.client.commons.ButtonInput.FEMALE;
 import static com.liga.internship.client.commons.ButtonInput.MALE;
 import static com.liga.internship.client.commons.TextMessage.*;
 
@@ -118,7 +118,7 @@ public class FillProfileHandler implements InputMessageHandler {
     }
 
     private String getCaptureFromUserProfile(UserProfile userProfile) {
-        String gender = userProfile.getGender().equals(CALLBACK_MALE) ? MALE : CALLBACK_FEMALE;
+        String gender = userProfile.getGender().equals(CALLBACK_MALE) ? MALE : FEMALE;
         String username = textService.translateTextIntoSlavOld(userProfile.getUsername());
         return String.format("%s, %s", gender, username);
     }

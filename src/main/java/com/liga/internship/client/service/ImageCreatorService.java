@@ -14,6 +14,7 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.text.AttributedCharacterIterator;
 import java.text.AttributedString;
@@ -28,12 +29,14 @@ public class ImageCreatorService {
 
     @Value("${message.background}")
     private Resource resource;
+    @Value("${temp.folder}")
+    private Path folderPath;
 
     public File getImageWithTextFile(String description, long userId) {
         File trend = null;
         try {
             BufferedImage bufferedImage = getImageWithText(description);
-            Files.createDirectories(Paths.get("temp"));
+            Files.createDirectories(folderPath);
             trend = new File(String.format("temp/image%d.jpg", userId));
             ImageIO.write(bufferedImage, "jpg", trend);
         } catch (IOException e) {

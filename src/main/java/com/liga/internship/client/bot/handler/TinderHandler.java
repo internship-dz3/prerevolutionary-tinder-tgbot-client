@@ -3,7 +3,6 @@ package com.liga.internship.client.bot.handler;
 import com.liga.internship.client.bot.BotState;
 import com.liga.internship.client.cache.TinderDataCache;
 import com.liga.internship.client.cache.UserDataCache;
-import com.liga.internship.client.commons.ButtonInput;
 import com.liga.internship.client.domain.UserProfile;
 import com.liga.internship.client.domain.dto.UsersIdTo;
 import com.liga.internship.client.service.*;
@@ -20,7 +19,7 @@ import java.util.Optional;
 
 import static com.liga.internship.client.bot.BotState.*;
 import static com.liga.internship.client.commons.ButtonCallback.*;
-import static com.liga.internship.client.commons.ButtonInput.*;
+import static com.liga.internship.client.commons.ButtonInput.MALE;
 import static com.liga.internship.client.commons.TextMessage.MESSAGE_COMEBACK_LATER;
 import static com.liga.internship.client.commons.TextMessage.MESSAGE_MAIN_MENU;
 

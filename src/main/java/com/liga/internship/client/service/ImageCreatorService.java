@@ -15,7 +15,6 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.text.AttributedCharacterIterator;
 import java.text.AttributedString;
 import java.util.ArrayList;
@@ -37,7 +36,7 @@ public class ImageCreatorService {
         try {
             BufferedImage bufferedImage = getImageWithText(description);
             Files.createDirectories(folderPath);
-            trend = new File(String.format("temp/image%d.jpg", userId));
+            trend = new File(String.format("%s/image%d.jpg", folderPath.toString(), userId));
             ImageIO.write(bufferedImage, "jpg", trend);
         } catch (IOException e) {
             e.printStackTrace();
@@ -49,8 +48,7 @@ public class ImageCreatorService {
         String[] formatted = getTransformedTextWithNewLine(text);
         BufferedImage image = null;
         try {
-            File imageFile = resource.getFile();
-            image = ImageIO.read(imageFile);
+            image = ImageIO.read(resource.getInputStream());
             Font headerFont = new Font("Old Standard TT", Font.BOLD, 55);
             Font descriptionFont = new Font("Old Standard TT", Font.PLAIN, 24);
             Rectangle rect = new Rectangle(image.getWidth(), image.getHeight());

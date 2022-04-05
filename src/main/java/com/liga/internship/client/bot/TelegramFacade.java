@@ -41,12 +41,7 @@ public class TelegramFacade {
         String inputMsg = message.getText();
         long userId = message.getFrom().getId();
         BotState botState;
-        boolean isActive = userDataCache.isLoggedIn(userId);
-        if(!isActive) {
-            botState = userDataCache.getUsersCurrentBotState(userId);
-        } else {
-            botState = getBotState(inputMsg, userId);
-        }
+        botState = getBotState(inputMsg, userId);
         userDataCache.setUsersCurrentBotState(userId, botState);
         return botStateContext.processInputMessage(botState, message);
     }
@@ -55,6 +50,8 @@ public class TelegramFacade {
         BotState botState;
         switch (inputMsg) {
             case START:
+                botState = HANDLER_LOGIN;
+                break;
             case CHANGE_PROFILE:
                 botState = HANDLER_PROFILE_FILLING;
                 break;

@@ -104,16 +104,12 @@ public class FillProfileHandler implements InputMessageHandler {
     }
 
     private UserProfile getRegisteredUserProfile(UserProfile userProfile) {
-        if (userProfile.getId() != null) {
-            v1RestService.updateUser(userProfile);
-        } else {
             Optional<UserProfile> optionalNewUser = v1RestService.registerNewUser(userProfile);
             if (optionalNewUser.isPresent()) {
                 userProfile = optionalNewUser.get();
             } else {
                 throw new RuntimeException("user not found");
             }
-        }
         return userProfile;
     }
 

@@ -7,6 +7,7 @@ import com.liga.internship.client.service.LoginService;
 import com.liga.internship.client.service.MainMenuService;
 import com.liga.internship.client.service.V1RestService;
 import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.meta.api.methods.PartialBotApiMethod;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
@@ -24,6 +25,7 @@ import static com.liga.internship.client.commons.TextMessage.MESSAGE_WELCOME;
  * Если пользователя нет на сервере, создается новый пользователь.
  * Обработчик хранит состояние просматриваемых данных.
  */
+@Slf4j
 @Component
 @AllArgsConstructor
 public class LoginHandler implements InputMessageHandler, InputCallbackHandler {
@@ -45,6 +47,7 @@ public class LoginHandler implements InputMessageHandler, InputCallbackHandler {
     }
 
     private SendMessage getSendMessage(long userId, long chatId) {
+        log.debug("UserID: " + userId +  "Chat ID: " + chatId + " :getSendMessage");
         Optional<UserProfile> userProfile = v1RestService.userLogin(userId);
         if (userProfile.isPresent()) {
             userDataCache.saveUserProfile(userId, userProfile.get());
@@ -59,6 +62,7 @@ public class LoginHandler implements InputMessageHandler, InputCallbackHandler {
 
     @Override
     public PartialBotApiMethod<?> handleCallback(CallbackQuery callbackQuery) {
+        log.debug(callbackQuery.getMessage().toString() + " handleCallback");
         long userId = callbackQuery.getFrom().getId();
         long chatId = callbackQuery.getMessage().getChatId();
         return getSendMessage(userId, chatId);

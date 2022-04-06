@@ -80,6 +80,7 @@ public class TinderHandler implements InputMessageHandler, InputCallbackHandler 
     }
 
     private String getCaptureFromUserProfile(UserProfile userProfile) {
+        log.debug(userProfile.getUsername());
         String gender = userProfile.getGender().equals(CALLBACK_MALE) ? MALE : FEMALE;
         String username = textService.translateTextIntoSlavOld(userProfile.getUsername());
         return String.format("%s, %s", gender, username);
@@ -87,6 +88,7 @@ public class TinderHandler implements InputMessageHandler, InputCallbackHandler 
 
     @Override
     public PartialBotApiMethod<?> handleCallback(CallbackQuery callbackQuery) {
+        log.debug(callbackQuery.getMessage().toString());
         String callbackQueryData = callbackQuery.getData();
         long userId = callbackQuery.getFrom().getId();
         long chatId = callbackQuery.getMessage().getChatId();

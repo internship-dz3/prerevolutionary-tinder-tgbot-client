@@ -33,11 +33,13 @@ public class TelegramFacade {
     }
 
     private PartialBotApiMethod<?> handleCallbackQuery(CallbackQuery callbackQuery) {
+        log.debug(callbackQuery.getMessage().toString());
         long userId = callbackQuery.getFrom().getId();
         return botStateContext.processInputCallback(userDataCache.getUsersCurrentBotState(userId), callbackQuery);
     }
 
     private PartialBotApiMethod<?> handleInputMessage(Message message) {
+        log.debug(message.toString());
         String inputMsg = message.getText();
         long userId = message.getFrom().getId();
         BotState botState;

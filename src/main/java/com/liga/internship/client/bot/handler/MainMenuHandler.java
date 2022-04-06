@@ -4,6 +4,7 @@ import com.liga.internship.client.bot.BotState;
 import com.liga.internship.client.cache.UserDataCache;
 import com.liga.internship.client.service.MainMenuService;
 import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.meta.api.methods.PartialBotApiMethod;
 import org.telegram.telegrambots.meta.api.objects.CallbackQuery;
@@ -17,6 +18,7 @@ import static com.liga.internship.client.commons.TextMessage.MESSAGE_MAIN_MENU;
  * Обработчик входящих Message и CallbackQuery сообщений телеграм бота, связанных с отображением главного меню.
  * Обработчик хранит состояние просматриваемых данных.
  */
+@Slf4j
 @Component
 @AllArgsConstructor
 public class MainMenuHandler implements InputMessageHandler, InputCallbackHandler {
@@ -35,6 +37,7 @@ public class MainMenuHandler implements InputMessageHandler, InputCallbackHandle
 
     @Override
     public PartialBotApiMethod<?> handleCallback(CallbackQuery callbackQuery) {
+        log.debug(callbackQuery.getMessage().toString());
         long chatId = callbackQuery.getMessage().getChatId();
         long userId = callbackQuery.getFrom().getId();
         userDataCache.setUsersCurrentBotState(userId, HANDLER_LOGIN);

@@ -6,6 +6,7 @@ import com.liga.internship.client.cache.UserDataCache;
 import com.liga.internship.client.domain.UserProfile;
 import com.liga.internship.client.service.*;
 import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.telegram.telegrambots.meta.api.methods.PartialBotApiMethod;
 import org.telegram.telegrambots.meta.api.objects.CallbackQuery;
@@ -24,6 +25,7 @@ import static com.liga.internship.client.commons.TextMessage.*;
  * Обработчик входящих Message и CallbackQuery сообщений телеграм бота, связанных с просмотром страниц Любимцев.
  * Обработчик хранит состояние просматриваемых данных.
  */
+@Slf4j
 @Service
 @AllArgsConstructor
 public class FavoritesHandler implements InputCallbackHandler, InputMessageHandler {
@@ -42,6 +44,7 @@ public class FavoritesHandler implements InputCallbackHandler, InputMessageHandl
 
     @Override
     public PartialBotApiMethod<?> handleCallback(CallbackQuery callbackQuery) {
+        log.debug(callbackQuery.getMessage().toString());
         long userId = callbackQuery.getFrom().getId();
         long chatId = callbackQuery.getMessage().getChatId();
         int messageId = callbackQuery.getMessage().getMessageId();
@@ -79,6 +82,7 @@ public class FavoritesHandler implements InputCallbackHandler, InputMessageHandl
     }
 
     private String createMessageCation(long userId, UserProfile nextUser) {
+        log.debug(nextUser.getUsername());
         String gender = MALE;
         String status = favoritesDataCache.getFaforiteListStatus(userId);
         if (nextUser.getGender().equals(CALLBACK_FEMALE)) {
@@ -93,6 +97,7 @@ public class FavoritesHandler implements InputCallbackHandler, InputMessageHandl
 
     @Override
     public PartialBotApiMethod<?> handleMessage(Message message) {
+        log.debug(message.getChatId().toString());
         String userButtonInput = message.getText();
         long userId = message.getFrom().getId();
         long chatId = message.getChatId();

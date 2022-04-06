@@ -7,6 +7,7 @@ import com.liga.internship.client.service.ImageCreatorService;
 import com.liga.internship.client.service.ProfileService;
 import com.liga.internship.client.service.TextService;
 import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.meta.api.methods.PartialBotApiMethod;
 import org.telegram.telegrambots.meta.api.objects.Message;
@@ -21,6 +22,7 @@ import static com.liga.internship.client.commons.ButtonInput.MALE;
  * Обработчик входящих Messageсообщений телеграм бота, связанных с просмотром профиля пользователя и соответствующего меню.
  * Обработчик хранит состояние просматриваемых данных.
  */
+@Slf4j
 @Component
 @AllArgsConstructor
 public class ShowProfileHandler implements InputMessageHandler {
@@ -45,6 +47,7 @@ public class ShowProfileHandler implements InputMessageHandler {
     }
 
     private String getCaptureFromUserProfile(UserProfile userProfile) {
+        log.debug(userProfile.getDescription());
         String gender = userProfile.getGender().equals(CALLBACK_MALE) ? MALE : FEMALE;
         String username = textService.translateTextIntoSlavOld(userProfile.getUsername());
         return String.format("%s, %s", gender, username);

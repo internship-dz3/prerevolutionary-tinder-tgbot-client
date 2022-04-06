@@ -92,6 +92,7 @@ public class FillProfileHandler implements InputMessageHandler {
     }
 
     private PartialBotApiMethod<?> getMessageReplyForAskName(String userAnswer, long userId, long chatId, UserProfile userProfile) {
+        log.debug(userProfile.getUsername(), userId, chatId + " getMessageReplyForAskName");
         PartialBotApiMethod<?> replyToUser;
         if (userProfile.setGenderByButtonCallback(userAnswer)) {
             replyToUser = replyMessageService.getReplyMessage(chatId, MESSAGE_ENTER_YOUR_NAME);
@@ -104,16 +105,18 @@ public class FillProfileHandler implements InputMessageHandler {
     }
 
     private UserProfile getRegisteredUserProfile(UserProfile userProfile) {
-            Optional<UserProfile> optionalNewUser = v1RestService.registerNewUser(userProfile);
-            if (optionalNewUser.isPresent()) {
-                userProfile = optionalNewUser.get();
-            } else {
-                throw new RuntimeException("user not found");
-            }
+        log.debug(userProfile.getUsername() + " getRegisteredUserProfile");
+        Optional<UserProfile> optionalNewUser = v1RestService.registerNewUser(userProfile);
+        if (optionalNewUser.isPresent()) {
+            userProfile = optionalNewUser.get();
+        } else {
+            throw new RuntimeException("user not found");
+        }
         return userProfile;
     }
 
     private String getCaptureFromUserProfile(UserProfile userProfile) {
+        log.debug(userProfile.getUsername() + " getCaptureFromUserProfile");
         String gender = userProfile.getGender().equals(CALLBACK_MALE) ? MALE : FEMALE;
         String username = textService.translateTextIntoSlavOld(userProfile.getUsername());
         return String.format("%s, %s", gender, username);

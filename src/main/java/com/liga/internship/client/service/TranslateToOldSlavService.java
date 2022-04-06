@@ -15,7 +15,7 @@ public class TranslateToOldSlavService {
         int numOfSymbsInStr;
 
         String tmpWord;
-        String tmpResult = null;
+        String tmpResult = "";
 
         int currStrPartNum = 0;
 
@@ -25,7 +25,7 @@ public class TranslateToOldSlavService {
         while (currStrPartNum < numOfStringParts) {
             if (mode.equals("random")) {
                 if (Math.round(Math.random()) != Math.round(Math.random())) {
-                    tmpResult += " " + arrStrParts[currStrPartNum];
+                    tmpResult += "" + arrStrParts[currStrPartNum];
                     currStrPartNum++;
 
                     isChange = false;
@@ -212,6 +212,6 @@ public class TranslateToOldSlavService {
         String input = "К аристократке, истинной аристократке духа." +
                 " Душа, полная аккордов поэзии, душа, сильная волей, жадная стремлением к деятельной жизни, к самобытности, к творчеству. " +
                 "Найду ли в прекрасной, чарующей улыбке, в тихом сиянии ее глаз оправдание, разгадку мучительного существования?";
-        System.out.println(translateToOldSlavService.translateTextToOldSlav(translateToOldSlavService.translateWordToOldSlav(input), "random"));
+        System.out.println(translateToOldSlavService.translateTextToOldSlav(translateToOldSlavService.translateWordToOldSlav(input), "throne"));
     }
 }

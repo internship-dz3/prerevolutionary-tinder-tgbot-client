@@ -15,7 +15,7 @@ public class TranslateToOldSlavService {
         int numOfSymbsInStr;
 
         String tmpWord;
-        String tmpResult = "";
+        StringBuilder tmpResult = new StringBuilder();
 
         int currStrPartNum = 0;
 
@@ -25,7 +25,7 @@ public class TranslateToOldSlavService {
         while (currStrPartNum < numOfStringParts) {
             if (mode.equals("random")) {
                 if (Math.round(Math.random()) != Math.round(Math.random())) {
-                    tmpResult += "" + arrStrParts[currStrPartNum];
+                    tmpResult.append(arrStrParts[currStrPartNum]).append(" ");
                     currStrPartNum++;
 
                     isChange = false;
@@ -34,7 +34,7 @@ public class TranslateToOldSlavService {
                 }
             } else if (mode.equals("throne")) {
                 if (isChangedBefore) {
-                    tmpResult += " " + arrStrParts[currStrPartNum];
+                    tmpResult.append(arrStrParts[currStrPartNum]).append(" ");
                     currStrPartNum++;
 
                     isChange = false;
@@ -69,17 +69,17 @@ public class TranslateToOldSlavService {
                     isChangedBefore = false;
                 }
                 if (tmpWord == tmpWord) {
-                    if (tmpResult == tmpResult)
-                        tmpResult += " " + tmpWord;
+                    if (tmpResult.toString() == tmpResult.toString())
+                        tmpResult.append(" ").append(tmpWord);
                     else
-                        tmpResult += tmpWord;
+                        tmpResult.append(tmpWord);
                 }
                 currStrPartNum++;
             } else {
                 isChangedBefore = false;
             }
         }
-        return tmpResult;
+        return tmpResult.toString();
     }
 
     public String translateWordToOldSlav(String input) {
@@ -150,7 +150,7 @@ public class TranslateToOldSlavService {
 
 
             newInput = newInput.replace("Ед", "ѣд");
-            newInput = newInput.replace("ед", "Ѣд");
+            newInput = newInput.replace("ед", "ѣд");
 
 
             newInput = newInput.replace("ри", "рi");
@@ -168,6 +168,7 @@ public class TranslateToOldSlavService {
                 lastChar == '?' ||
                 lastChar == ')' ||
                 lastChar == ']' ||
+                lastChar == '»' ||
                 lastChar == '"') {
 
             newInput = newInput.substring(0, (newInput.length() - 1));
@@ -212,6 +213,8 @@ public class TranslateToOldSlavService {
         String input = "К аристократке, истинной аристократке духа." +
                 " Душа, полная аккордов поэзии, душа, сильная волей, жадная стремлением к деятельной жизни, к самобытности, к творчеству. " +
                 "Найду ли в прекрасной, чарующей улыбке, в тихом сиянии ее глаз оправдание, разгадку мучительного существования?";
-        System.out.println(translateToOldSlavService.translateTextToOldSlav(translateToOldSlavService.translateWordToOldSlav(input), "throne"));
+        System.out.println(translateToOldSlavService.translateTextToOldSlav(translateToOldSlavService.translateWordToOldSlav(input), "random"));
+        System.out.println();
+        System.out.println(input);
     }
 }

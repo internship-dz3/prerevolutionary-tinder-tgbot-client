@@ -143,7 +143,7 @@ public class V1RestService {
 
     /**
      * Обновление существующего пользователя
-     *
+     *  d
      * @param userProfile - профиль существующего профиля
      */
     public void updateUser(UserProfile userProfile) {

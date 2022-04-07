@@ -25,7 +25,7 @@ import static com.liga.internship.client.commons.ButtonInput.MALE;
 @AllArgsConstructor
 public class ShowProfileHandler implements InputMessageHandler {
     private final UserDataCache userDataCache;
-    private final ProfileService showProfileService;
+    private final ProfileService profileService;
     private final ImageCreatorService imageCreatorService;
     private final TextService textService;
 
@@ -41,7 +41,7 @@ public class ShowProfileHandler implements InputMessageHandler {
         UserProfile userProfile = userDataCache.getUserProfile(userId);
         File imageWithTextFile = imageCreatorService.getImageWithTextFile(userProfile.getDescription(), userId);
         userDataCache.setUsersCurrentBotState(userId, BotState.SHOW_USER_PROFILE);
-        return showProfileService.getProfileTextMessageWihProfileMenu(chatId, imageWithTextFile, getCaptureFromUserProfile(userProfile));
+        return profileService.getProfileTextMessageWihProfileMenu(chatId, imageWithTextFile, getCaptureFromUserProfile(userProfile));
     }
 
     private String getCaptureFromUserProfile(UserProfile userProfile) {

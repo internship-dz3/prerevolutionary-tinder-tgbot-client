@@ -27,12 +27,11 @@ import static com.liga.internship.client.commons.TextMessage.*;
 @Service
 @AllArgsConstructor
 public class FavoritesHandler implements InputCallbackHandler, InputMessageHandler {
-    private final V1RestService v1RestService;
     private final UserDataCache userDataCache;
+    private final FavoritesDataCache favoritesDataCache;
+    private final V1RestService v1RestService;
     private final FavoritesService favoritesService;
     private final ImageCreatorService imageCreatorService;
-    private final FavoritesDataCache favoritesDataCache;
-    private final MainMenuService mainMenuService;
     private final TextService textService;
 
     @Override
@@ -73,7 +72,7 @@ public class FavoritesHandler implements InputCallbackHandler, InputMessageHandl
         if (callbackData.equals(CALLBACK_MENU)) {
             favoritesDataCache.removeFaforites(userId);
             userDataCache.setUsersCurrentBotState(userId, HANDLER_MAIN_MENU);
-            replyMessage = mainMenuService.getMainMenuMessage(chatId, MESSAGE_MAIN_MENU);
+            replyMessage = favoritesService.getMainMenuMessage(chatId, MESSAGE_MAIN_MENU);
         }
         return replyMessage;
     }
@@ -96,7 +95,7 @@ public class FavoritesHandler implements InputCallbackHandler, InputMessageHandl
         String userButtonInput = message.getText();
         long userId = message.getFrom().getId();
         long chatId = message.getChatId();
-        List<UserProfile> favoritesList = getFavoriteList(userButtonInput,userId);
+        List<UserProfile> favoritesList = getFavoriteList(userButtonInput, userId);
         File imageWithTextFile;
         String messageCaption;
         PartialBotApiMethod<?> replyMessage;
@@ -104,7 +103,7 @@ public class FavoritesHandler implements InputCallbackHandler, InputMessageHandl
             UserProfile userProfile = favoritesList.get(0);
             messageCaption = createMessageCation(userId, userProfile);
             imageWithTextFile = imageCreatorService.getImageWithTextFile(userProfile.getDescription(), userId);
-            replyMessage = favoritesService.getMenuInlineKeyBoardService(chatId, imageWithTextFile, messageCaption);
+            replyMessage = favoritesService.getPhotoMessageWithInlineMenuKeyboard(chatId, imageWithTextFile, messageCaption);
         } else if (favoritesList.isEmpty()) {
             replyMessage = favoritesService.getReplyFavoritesKeyboardTextMessage(chatId, MESSAGE_EMPTY);
 
@@ -114,12 +113,14 @@ public class FavoritesHandler implements InputCallbackHandler, InputMessageHandl
             messageCaption = createMessageCation(userId, showFirst);
             imageWithTextFile = imageCreatorService.getImageWithTextFile(showFirst.getDescription(), userId);
             replyMessage = favoritesService.getNextPrevInlineKeyboardPhotoMessage(chatId, imageWithTextFile, messageCaption);
+            userDataCache.setUsersCurrentBotState(userId, SHOW_NEXT_FAVORITE);
         }
 
         if (userButtonInput.equals(FAVORITES)) {
             replyMessage = favoritesService.getReplyFavoritesKeyboardTextMessage(chatId, MESSAGE_FAVORITE);
+            userDataCache.setUsersCurrentBotState(userId, HANDLER_SHOW_FAVORITES);
         }
-        userDataCache.setUsersCurrentBotState(userId, HANDLER_SHOW_FAVORITES);
+
         return replyMessage;
     }
 

@@ -25,6 +25,7 @@ import java.util.Locale;
 @RequiredArgsConstructor
 public class ImageCreatorService {
     private final TextService textService;
+    private final TranslateToOldSlavService translateToOldSlavService;
 
     @Value("${message.background}")
     private Resource resource;
@@ -92,7 +93,7 @@ public class ImageCreatorService {
     }
 
     private String[] getTransformedTextWithNewLine(String text) {
-        String translatedText = textService.translateTextIntoSlavOld(text);
+        String translatedText = translateToOldSlavService.translateTextToOldSlav(text, "");
         return translatedText.replaceFirst("\\s", " \n").split("\n");
     }
 }

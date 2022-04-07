@@ -83,7 +83,7 @@ public class TranslateToOldSlavService {
     }
 
     public String translateWordToOldSlav(String input) {
-        String curChar = null;
+        String curChar;
 
         String newInput = input;
 
@@ -199,7 +199,7 @@ public class TranslateToOldSlavService {
                 curChar.equals("ш") ||
                 curChar.equals("щ")) {
             newInput += "ъ";
-        } else if (curChar == "ы") {
+        } else if (curChar.equals("ы")) {
             newInput = newInput.substring(0, (newInput.length() - 1)) + "ъ";
         }
         newInput += lastChar;
@@ -209,10 +209,8 @@ public class TranslateToOldSlavService {
 
     public static void main(String[] args) {
         TranslateToOldSlavService translateToOldSlavService = new TranslateToOldSlavService();
-        String input = "К аристократке, истинной аристократке духа." +
-                " Душа, полная аккордов поэзии, душа, сильная волей, жадная стремлением к деятельной жизни, к самобытности, к творчеству. " +
-                "Найду ли в прекрасной, чарующей улыбке, в тихом сиянии ее глаз оправдание, разгадку мучительного существования?";
-        System.out.println(translateToOldSlavService.translateTextToOldSlav(translateToOldSlavService.translateWordToOldSlav(input), "throne"));
+        String input = "К аристократке, истинной аристократке духа. Душа, полная аккордов поэзии, душа, сильная волей, жадная стремлением к деятельной жизни, к самобытности, к творчеству. Найду ли в прекрасной, чарующей улыбке, в тихом сиянии ее глаз оправдание, разгадку мучительного существования?";
+        System.out.println(translateToOldSlavService.translateTextToOldSlav(translateToOldSlavService.translateWordToOldSlav(input), ""));
         System.out.println();
         System.out.println(input);
     }

@@ -34,6 +34,7 @@ public class FillProfileHandler implements InputMessageHandler {
     private final ImageCreatorService imageCreatorService;
     private final MainMenuService mainMenuService;
     private final TextService textService;
+    private final TranslateToOldSlavService translateToOldSlavService;
 
     @Override
     public BotState getHandlerName() {
@@ -115,7 +116,7 @@ public class FillProfileHandler implements InputMessageHandler {
 
     private String getCaptureFromUserProfile(UserProfile userProfile) {
         String gender = userProfile.getGender().equals(CALLBACK_MALE) ? MALE : FEMALE;
-        String username = textService.translateTextIntoSlavOld(userProfile.getUsername());
+        String username = translateToOldSlavService.translateTextToOldSlav(userProfile.getUsername(),"");
         return String.format("%s, %s", gender, username);
     }
 }

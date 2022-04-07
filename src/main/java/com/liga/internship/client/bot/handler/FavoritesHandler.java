@@ -33,7 +33,8 @@ public class FavoritesHandler implements InputCallbackHandler, InputMessageHandl
     private final ImageCreatorService imageCreatorService;
     private final FavoritesDataCache favoritesDataCache;
     private final MainMenuService mainMenuService;
-    private final TextService textService;
+//    private final TextService textService;
+    private final TranslateToOldSlavService translateToOldSlavService;
 
     @Override
     public BotState getHandlerName() {
@@ -87,7 +88,7 @@ public class FavoritesHandler implements InputCallbackHandler, InputMessageHandl
                 status = CAPTION_FAVORITE_FEMALE;
             }
         }
-        String transformedUsername = textService.translateTextIntoSlavOld(nextUser.getUsername());
+        String transformedUsername = translateToOldSlavService.translateTextToOldSlav(nextUser.getUsername(),"");
         return String.format("%s, %s, %s", gender, transformedUsername, status);
     }
 

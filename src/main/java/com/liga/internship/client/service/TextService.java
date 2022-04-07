@@ -18,14 +18,10 @@ public class TextService {
     }
 
     private String modifyEndOfTheWord(String word) {
-
         List<String> modifiableLetters = List.of("б", "в", "г", "д", "з", "к", "л", "м", "н", "п", "р", "с", "т", "ф", "х");
         String symbol = getLastSymbolIfExists(word);
         if (!symbol.equals("")) {
             word = removeLastChar(word);
-        }
-        if(word == null || word.isBlank()) {
-            return "";
         }
         if (modifiableLetters.contains(String.valueOf(word.charAt(word.length() - 1)))) {
             return word + "ъ" + symbol + " ";
@@ -38,9 +34,6 @@ public class TextService {
     }
 
     private String getLastSymbolIfExists(String word) {
-        if(word.isEmpty()) {
-            return "";
-        }
         List<String> symbols = List.of("?", ":", ";", "-", " ");
         String lastChar = String.valueOf(word.charAt(word.length() - 1));
         if (symbols.contains(lastChar)) {

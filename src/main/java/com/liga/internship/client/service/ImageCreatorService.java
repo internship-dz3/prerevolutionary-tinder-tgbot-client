@@ -14,7 +14,7 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
-import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.text.AttributedCharacterIterator;
 import java.text.AttributedString;
 import java.util.ArrayList;
@@ -28,15 +28,13 @@ public class ImageCreatorService {
 
     @Value("${message.background}")
     private Resource resource;
-    @Value("${temp.folder}")
-    private Path folderPath;
 
     public File getImageWithTextFile(String description, long userId) {
         File trend = null;
         try {
             BufferedImage bufferedImage = getImageWithText(description);
-            Files.createDirectories(folderPath);
-            trend = new File(String.format("%s/image%d.jpg", folderPath.toString(), userId));
+            Files.createDirectories(Paths.get("temp"));
+            trend = new File(String.format("temp/image%d.jpg", userId));
             ImageIO.write(bufferedImage, "jpg", trend);
         } catch (IOException e) {
             e.printStackTrace();
@@ -48,7 +46,8 @@ public class ImageCreatorService {
         String[] formatted = getTransformedTextWithNewLine(text);
         BufferedImage image = null;
         try {
-            image = ImageIO.read(resource.getInputStream());
+            File imageFile = resource.getFile();
+            image = ImageIO.read(imageFile);
             Font headerFont = new Font("Old Standard TT", Font.BOLD, 55);
             Font descriptionFont = new Font("Old Standard TT", Font.PLAIN, 24);
             Rectangle rect = new Rectangle(image.getWidth(), image.getHeight());

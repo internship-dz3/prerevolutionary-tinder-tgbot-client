@@ -3,6 +3,7 @@ package com.liga.internship.client.bot.handler;
 import com.liga.internship.client.bot.BotState;
 import com.liga.internship.client.cache.TinderDataCache;
 import com.liga.internship.client.cache.UserDataCache;
+import com.liga.internship.client.commons.ButtonInput;
 import com.liga.internship.client.domain.UserProfile;
 import com.liga.internship.client.domain.dto.UsersIdTo;
 import com.liga.internship.client.service.*;
@@ -48,11 +49,7 @@ public class TinderHandler implements InputMessageHandler, InputCallbackHandler 
     public PartialBotApiMethod<?> handleMessage(Message message) {
         long userId = message.getFrom().getId();
         long chatId = message.getChatId();
-        String answer = message.getText();
-        if (answer.equals(SEARCH)) {
-            return startVoting(userId, chatId);
-        }
-        return mainMenuService.getMainMenuMessage(chatId, MESSAGE_MAIN_MENU);
+        return startVoting(userId, chatId);
     }
 
     private PartialBotApiMethod<?> startVoting(long userId, long chatId) {
@@ -80,7 +77,7 @@ public class TinderHandler implements InputMessageHandler, InputCallbackHandler 
     }
 
     private String getCaptureFromUserProfile(UserProfile userProfile) {
-        String gender = userProfile.getGender().equals(CALLBACK_MALE) ? MALE : FEMALE;
+        String gender = userProfile.getGender().equals(CALLBACK_MALE) ? MALE : CALLBACK_FEMALE;
         String username = textService.translateTextIntoSlavOld(userProfile.getUsername());
         return String.format("%s, %s", gender, username);
     }
@@ -98,13 +95,12 @@ public class TinderHandler implements InputMessageHandler, InputCallbackHandler 
             return mainMenuService.getMainMenuMessage(chatId, MESSAGE_MAIN_MENU);
         }
         if (callbackQueryData.equals(CALLBACK_LIKE)) {
-            Optional<UserProfile> favoriteUser = tinderDataCache.getUserFromVotingProcess(userId);
-            favoriteUser.ifPresent(userProfile -> v1RestService.sendLikeRequest(new UsersIdTo(currentUser.getTelegramId(), userProfile.getTelegramId())));
-
+            UserProfile favoriteUser = tinderDataCache.getUserFromVotingProcess(userId);
+            v1RestService.sendLikeRequest(new UsersIdTo(currentUser.getId(), favoriteUser.getId()));
         }
         if (callbackQueryData.equals(CALLBACK_DISLIKE)) {
-            Optional<UserProfile> favoriteUser = tinderDataCache.getUserFromVotingProcess(userId);
-            favoriteUser.ifPresent(userProfile -> v1RestService.sendDislikeRequest(new UsersIdTo(currentUser.getTelegramId(), userProfile.getTelegramId())));
+            UserProfile favoriteUser = tinderDataCache.getUserFromVotingProcess(userId);
+            v1RestService.sendDislikeRequest(new UsersIdTo(currentUser.getId(), favoriteUser.getId()));
         }
         Optional<UserProfile> next = tinderDataCache.getNext(userId);
         if (next.isPresent()) {

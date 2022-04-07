@@ -4,7 +4,7 @@ public class TranslateToOldSlavService {
 
     public String translateTextToOldSlav(String srcTxt, String mode) {
         if (srcTxt == null) {
-            return "";
+            return " ";
         }
         if (mode == null) {
             return "";
@@ -68,9 +68,9 @@ public class TranslateToOldSlavService {
                     tmpWord = arrStrParts[currStrPartNum];
                     isChangedBefore = false;
                 }
-                if (tmpWord == tmpWord) {
-                    if (tmpResult.toString() == tmpResult.toString())
-                        tmpResult.append(" ").append(tmpWord);
+                if (tmpWord.equals(tmpWord)) {
+                    if (tmpResult.toString().equals(tmpResult.toString()))
+                        tmpResult.append(tmpWord).append(" ");
                     else
                         tmpResult.append(tmpWord);
                 }
@@ -83,8 +83,7 @@ public class TranslateToOldSlavService {
     }
 
     public String translateWordToOldSlav(String input) {
-        String output = "";
-        char curChar = 0;
+        String curChar = null;
 
         String newInput = input;
 
@@ -158,49 +157,49 @@ public class TranslateToOldSlavService {
 
         }
 
-        char lastChar = newInput.charAt(newInput.length() - 1);
+        String lastChar = String.valueOf(newInput.charAt(newInput.length() - 1));
 
-        if (lastChar == '.' ||
-                lastChar == ',' ||
-                lastChar == ';' ||
-                lastChar == ':' ||
-                lastChar == '!' ||
-                lastChar == '?' ||
-                lastChar == ')' ||
-                lastChar == ']' ||
-                lastChar == '»' ||
-                lastChar == '"') {
+        if (lastChar.equals(".") ||
+                lastChar.equals(",") ||
+                lastChar.equals(";") ||
+                lastChar.equals(":") ||
+                lastChar.equals("!") ||
+                lastChar.equals("?") ||
+                lastChar.equals(")") ||
+                lastChar.equals("]") ||
+                lastChar.equals("»") ||
+                lastChar.equals("\"")) {
 
             newInput = newInput.substring(0, (newInput.length() - 1));
-            curChar = newInput.charAt(newInput.length() - 1);
+            curChar = String.valueOf(newInput.charAt(newInput.length() - 1));
 
         } else {
             curChar = lastChar;
-            lastChar = '\0';
+            lastChar = " ";
         }
 
-        if (curChar == 'б' ||
-                curChar == 'в' ||
-                curChar == 'г' ||
-                curChar == 'д' ||
-                curChar == 'ж' ||
-                curChar == 'з' ||
-                curChar == 'к' ||
-                curChar == 'л' ||
-                curChar == 'м' ||
-                curChar == 'н' ||
-                curChar == 'п' ||
-                curChar == 'р' ||
-                curChar == 'с' ||
-                curChar == 'т' ||
-                curChar == 'ф' ||
-                curChar == 'х' ||
-                curChar == 'ц' ||
-                curChar == 'ч' ||
-                curChar == 'ш' ||
-                curChar == 'щ') {
+        if (curChar.equals("б") ||
+                curChar.equals("в") ||
+                curChar.equals("г") ||
+                curChar.equals("д") ||
+                curChar.equals("ж") ||
+                curChar.equals("з") ||
+                curChar.equals("к") ||
+                curChar.equals("л") ||
+                curChar.equals("м") ||
+                curChar.equals("н") ||
+                curChar.equals("п") ||
+                curChar.equals("р") ||
+                curChar.equals("с") ||
+                curChar.equals("т") ||
+                curChar.equals("ф") ||
+                curChar.equals("х") ||
+                curChar.equals("ц") ||
+                curChar.equals("ч") ||
+                curChar.equals("ш") ||
+                curChar.equals("щ")) {
             newInput += "ъ";
-        } else if (curChar == 'ы') {
+        } else if (curChar == "ы") {
             newInput = newInput.substring(0, (newInput.length() - 1)) + "ъ";
         }
         newInput += lastChar;
@@ -213,7 +212,7 @@ public class TranslateToOldSlavService {
         String input = "К аристократке, истинной аристократке духа." +
                 " Душа, полная аккордов поэзии, душа, сильная волей, жадная стремлением к деятельной жизни, к самобытности, к творчеству. " +
                 "Найду ли в прекрасной, чарующей улыбке, в тихом сиянии ее глаз оправдание, разгадку мучительного существования?";
-        System.out.println(translateToOldSlavService.translateTextToOldSlav(translateToOldSlavService.translateWordToOldSlav(input), "random"));
+        System.out.println(translateToOldSlavService.translateTextToOldSlav(translateToOldSlavService.translateWordToOldSlav(input), "throne"));
         System.out.println();
         System.out.println(input);
     }

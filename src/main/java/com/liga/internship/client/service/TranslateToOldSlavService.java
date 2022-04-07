@@ -7,7 +7,7 @@ public class TranslateToOldSlavService {
             return " ";
         }
         if (mode == null) {
-            return "";
+            return " ";
         }
 
         String[] arrStrParts = srcTxt.split(" ");
@@ -175,7 +175,7 @@ public class TranslateToOldSlavService {
 
         } else {
             curChar = lastChar;
-            lastChar = " ";
+            lastChar = "";
         }
 
         if (curChar.equals("б") ||

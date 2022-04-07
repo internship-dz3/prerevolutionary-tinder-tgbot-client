@@ -14,7 +14,6 @@ import java.util.Map;
 public class UserDataCache {
     private final Map<Long, BotState> userBotStates = new HashMap<>();
     private final Map<Long, UserProfile> userProfileMap = new HashMap<>();
-    private final Map<Long, Boolean> isLogged = new HashMap<>();
 
     /**
      * Получение опционального пользователя
@@ -44,10 +43,6 @@ public class UserDataCache {
         return botState;
     }
 
-    public boolean isLoggedIn(long userId) {
-        return isLogged.get(userId) != null && isLogged.get(userId);
-    }
-
     /**
      * Сохранение активного пользователя в кэш
      *
@@ -56,10 +51,6 @@ public class UserDataCache {
      */
     public void saveUserProfile(long userId, UserProfile userProfile) {
         userProfileMap.put(userId, userProfile);
-    }
-
-    public void setLoginUser(long userId, boolean isLogedIn) {
-        isLogged.put(userId, isLogedIn);
     }
 
     /**

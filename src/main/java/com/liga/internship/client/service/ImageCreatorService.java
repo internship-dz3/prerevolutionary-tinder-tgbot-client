@@ -14,27 +14,39 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
-import java.nio.file.Paths;
+import java.nio.file.Path;
 import java.text.AttributedCharacterIterator;
 import java.text.AttributedString;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
+/**
+ * Сервис создания изображения профиля пользователя, с указанным переведенным текстом
+ */
 @Service
 @RequiredArgsConstructor
 public class ImageCreatorService {
     private final TextService textService;
 
     @Value("${message.background}")
-    private Resource resource;
+    private Resource backgroundImageResourse;
+    //папка хранящее изображения сообщений пользователя
+    @Value("${temp.folder}")
+    private Path tempUserImagesFolderPath;
 
-    public File getImageWithTextFile(String description, long userId) {
+    /**
+     * @param text   -текст наносимый на картинку
+     * @param userId - id профиля пользователя
+     * @return File с картинкой
+     */
+    public File getImageWithTextFile(String text, long userId) {
         File trend = null;
         try {
-            BufferedImage bufferedImage = getImageWithText(description);
-            Files.createDirectories(Paths.get("temp"));
-            trend = new File(String.format("temp/image%d.jpg", userId));
+            String translatedText = textService.translateTextIntoSlavOld(text);
+            BufferedImage bufferedImage = getImageWithText(translatedText);
+            Files.createDirectories(tempUserImagesFolderPath);
+            trend = new File(String.format("%s/image%d.jpg", tempUserImagesFolderPath.toString(), userId));
             ImageIO.write(bufferedImage, "jpg", trend);
         } catch (IOException e) {
             e.printStackTrace();
@@ -46,8 +58,7 @@ public class ImageCreatorService {
         String[] formatted = getTransformedTextWithNewLine(text);
         BufferedImage image = null;
         try {
-            File imageFile = resource.getFile();
-            image = ImageIO.read(imageFile);
+            image = ImageIO.read(backgroundImageResourse.getInputStream());
             Font headerFont = new Font("Old Standard TT", Font.BOLD, 55);
             Font descriptionFont = new Font("Old Standard TT", Font.PLAIN, 24);
             Rectangle rect = new Rectangle(image.getWidth(), image.getHeight());
@@ -91,7 +102,6 @@ public class ImageCreatorService {
     }
 
     private String[] getTransformedTextWithNewLine(String text) {
-        String translatedText = textService.translateTextIntoSlavOld(text);
-        return translatedText.replaceFirst("\\s", " \n").split("\n");
+        return text.replaceFirst("\\s+", " \n").split("\n");
     }
 }

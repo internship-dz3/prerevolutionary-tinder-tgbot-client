@@ -99,10 +99,10 @@ public class V1RestService {
                 .block();
     }
 
-    public Optional<UserProfile> userLogin(long id) {
+    public Optional<UserProfile> userLogin(long telegramId) {
         Mono<UserProfile> userProfile = webClient.post().uri("http://localhost:8080/bibaboba/api/v1/user/login")
                 .header(CONTENT_TYPE, APPLICATION_JSON_VALUE)
-                .body(Mono.just(id), Long.class)
+                .body(Mono.just(telegramId), Long.class)
                 .retrieve()
                 .bodyToMono(UserProfile.class)
                 .onErrorResume(WebClientResponseException.class,

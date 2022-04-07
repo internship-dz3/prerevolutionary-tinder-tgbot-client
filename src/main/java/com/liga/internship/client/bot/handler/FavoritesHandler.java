@@ -96,7 +96,9 @@ public class FavoritesHandler implements InputCallbackHandler, InputMessageHandl
         String userButtonInput = message.getText();
         long userId = message.getFrom().getId();
         long chatId = message.getChatId();
-        List<UserProfile> favoritesList = getFavoriteList(userButtonInput,userId);
+        UserProfile currentUser = userDataCache.getUserProfile(userId);
+        long loggedUserId = currentUser.getId();
+        List<UserProfile> favoritesList = getFavoriteList(userButtonInput, loggedUserId, userId);
         File imageWithTextFile;
         String messageCaption;
         PartialBotApiMethod<?> replyMessage;
@@ -107,7 +109,6 @@ public class FavoritesHandler implements InputCallbackHandler, InputMessageHandl
             replyMessage = favoritesService.getMenuInlineKeyBoardService(chatId, imageWithTextFile, messageCaption);
         } else if (favoritesList.isEmpty()) {
             replyMessage = favoritesService.getReplyFavoritesKeyboardTextMessage(chatId, MESSAGE_EMPTY);
-
         } else {
             favoritesDataCache.setProcessDataList(userId, favoritesList);
             UserProfile showFirst = favoritesDataCache.getNextUser(userId);
@@ -117,23 +118,23 @@ public class FavoritesHandler implements InputCallbackHandler, InputMessageHandl
         }
 
         if (userButtonInput.equals(FAVORITES)) {
+            userDataCache.setUsersCurrentBotState(userId, HANDLER_SHOW_FAVORITES);
             replyMessage = favoritesService.getReplyFavoritesKeyboardTextMessage(chatId, MESSAGE_FAVORITE);
         }
-        userDataCache.setUsersCurrentBotState(userId, HANDLER_SHOW_FAVORITES);
         return replyMessage;
     }
 
-    private List<UserProfile> getFavoriteList(String userButtonInput, long userId) {
+    private List<UserProfile> getFavoriteList(String userButtonInput, long loggedUserId, long userId) {
         switch (userButtonInput) {
             case FAVORITE:
                 favoritesDataCache.setFavoriteSearchStatus(userId, CAPTION_FAVORITE);
-                return v1RestService.getFavoritesList(userId);
+                return v1RestService.getFavoritesList(loggedUserId);
             case ADMIRER:
                 favoritesDataCache.setFavoriteSearchStatus(userId, CAPTION_ADMIRER);
-                return v1RestService.getAdmirerList(userId);
+                return v1RestService.getAdmirerList(loggedUserId);
             case LOVE:
                 favoritesDataCache.setFavoriteSearchStatus(userId, CAPTION_LOVE);
-                return v1RestService.getLoveList(userId);
+                return v1RestService.getLoveList(loggedUserId);
             default:
                 return new ArrayList<>();
         }

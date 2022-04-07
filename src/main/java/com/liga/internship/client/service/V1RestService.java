@@ -87,6 +87,7 @@ public class V1RestService {
                 .retrieve()
                 .bodyToMono(Boolean.class)
                 .block();
+        //
     }
 
     public void updateUser(UserProfile userProfile) {

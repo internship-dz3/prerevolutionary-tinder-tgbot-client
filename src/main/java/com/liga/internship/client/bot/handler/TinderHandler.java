@@ -3,12 +3,10 @@ package com.liga.internship.client.bot.handler;
 import com.liga.internship.client.bot.BotState;
 import com.liga.internship.client.cache.TinderDataCache;
 import com.liga.internship.client.cache.UserDataCache;
+import com.liga.internship.client.commons.ButtonInput;
 import com.liga.internship.client.domain.UserProfile;
 import com.liga.internship.client.domain.dto.UsersIdTo;
-import com.liga.internship.client.service.ImageCreatorService;
-import com.liga.internship.client.service.TextService;
-import com.liga.internship.client.service.TinderService;
-import com.liga.internship.client.service.V1RestService;
+import com.liga.internship.client.service.*;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
@@ -37,7 +35,7 @@ public class TinderHandler implements InputMessageHandler, InputCallbackHandler 
     private final UserDataCache userDataCache;
     private final TinderService tinderService;
     private final ImageCreatorService imageCreatorService;
-
+    private final MainMenuService mainMenuService;
     private final TinderDataCache tinderDataCache;
     private final V1RestService v1RestService;
     private final TextService textService;
@@ -51,19 +49,16 @@ public class TinderHandler implements InputMessageHandler, InputCallbackHandler 
     public PartialBotApiMethod<?> handleMessage(Message message) {
         long userId = message.getFrom().getId();
         long chatId = message.getChatId();
-        String answer = message.getText();
-        if (answer.equals(SEARCH)) {
-            return startVoting(userId, chatId);
-        }
-        return tinderService.getMainMenuMessage(chatId, MESSAGE_MAIN_MENU);
+        return startVoting(userId, chatId);
     }
 
     private PartialBotApiMethod<?> startVoting(long userId, long chatId) {
-        List<UserProfile> notRatedUsers = v1RestService.getNotRatedUsers(userId);
+        UserProfile userProfile = userDataCache.getUserProfile(userId);
+        List<UserProfile> notRatedUsers = v1RestService.getNotRatedUsers(userProfile);
         PartialBotApiMethod<?> userReply;
         if (notRatedUsers.isEmpty()) {
             tinderDataCache.removeProcessList(userId);
-            userReply = tinderService.getMainMenuMessage(chatId, MESSAGE_COMEBACK_LATER);
+            userReply = mainMenuService.getMainMenuMessage(chatId, MESSAGE_COMEBACK_LATER);
         } else if (notRatedUsers.size() == 1) {
             UserProfile next = notRatedUsers.remove(0);
             tinderDataCache.setUserToVotingProcess(userId, next);
@@ -72,23 +67,17 @@ public class TinderHandler implements InputMessageHandler, InputCallbackHandler 
             userReply = tinderService.getLikeDislikeMenuPhotoMessage(chatId, imageWithTextFile, getCaptureFromUserProfile(next));
         } else {
             tinderDataCache.setProcessDataList(userId, notRatedUsers);
-            Optional<UserProfile> optionalNextUser = tinderDataCache.getNext(userId);
-            if (optionalNextUser.isPresent()) {
-                UserProfile next = optionalNextUser.get();
-                tinderDataCache.setUserToVotingProcess(userId, next);
-                userDataCache.setUsersCurrentBotState(userId, CONTINUE_VOTING);
-                File imageWithTextFile = imageCreatorService.getImageWithTextFile(next.getDescription(), userId);
-                userReply = tinderService.getLikeDislikeMenuPhotoMessage(chatId, imageWithTextFile, getCaptureFromUserProfile(next));
-            } else {
-                userReply = tinderService.getMainMenuMessage(chatId, MESSAGE_COMEBACK_LATER);
-            }
-
+            UserProfile next = tinderDataCache.getNext(userId).get();
+            tinderDataCache.setUserToVotingProcess(userId, next);
+            userDataCache.setUsersCurrentBotState(userId, CONTINUE_VOTING);
+            File imageWithTextFile = imageCreatorService.getImageWithTextFile(next.getDescription(), userId);
+            userReply = tinderService.getLikeDislikeMenuPhotoMessage(chatId, imageWithTextFile, getCaptureFromUserProfile(next));
         }
         return userReply;
     }
 
     private String getCaptureFromUserProfile(UserProfile userProfile) {
-        String gender = userProfile.getGender().equals(CALLBACK_MALE) ? MALE : FEMALE;
+        String gender = userProfile.getGender().equals(CALLBACK_MALE) ? MALE : CALLBACK_FEMALE;
         String username = textService.translateTextIntoSlavOld(userProfile.getUsername());
         return String.format("%s, %s", gender, username);
     }
@@ -103,16 +92,15 @@ public class TinderHandler implements InputMessageHandler, InputCallbackHandler 
         PartialBotApiMethod<?> reply;
         if (callbackQueryData.equals(CALLBACK_MENU)) {
             userDataCache.setUsersCurrentBotState(userId, HANDLER_MAIN_MENU);
-            return tinderService.getMainMenuMessage(chatId, MESSAGE_MAIN_MENU);
+            return mainMenuService.getMainMenuMessage(chatId, MESSAGE_MAIN_MENU);
         }
         if (callbackQueryData.equals(CALLBACK_LIKE)) {
-            Optional<UserProfile> favoriteUser = tinderDataCache.getUserFromVotingProcess(userId);
-            favoriteUser.ifPresent(userProfile -> v1RestService.sendLikeRequest(new UsersIdTo(currentUser.getTelegramId(), userProfile.getTelegramId())));
-
+            UserProfile favoriteUser = tinderDataCache.getUserFromVotingProcess(userId);
+            v1RestService.sendLikeRequest(new UsersIdTo(currentUser.getId(), favoriteUser.getId()));
         }
         if (callbackQueryData.equals(CALLBACK_DISLIKE)) {
-            Optional<UserProfile> favoriteUser = tinderDataCache.getUserFromVotingProcess(userId);
-            favoriteUser.ifPresent(userProfile -> v1RestService.sendDislikeRequest(new UsersIdTo(currentUser.getTelegramId(), userProfile.getTelegramId())));
+            UserProfile favoriteUser = tinderDataCache.getUserFromVotingProcess(userId);
+            v1RestService.sendDislikeRequest(new UsersIdTo(currentUser.getId(), favoriteUser.getId()));
         }
         Optional<UserProfile> next = tinderDataCache.getNext(userId);
         if (next.isPresent()) {

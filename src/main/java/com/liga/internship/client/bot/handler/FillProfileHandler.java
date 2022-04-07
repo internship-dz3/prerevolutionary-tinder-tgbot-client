@@ -3,10 +3,7 @@ package com.liga.internship.client.bot.handler;
 import com.liga.internship.client.bot.BotState;
 import com.liga.internship.client.cache.UserDataCache;
 import com.liga.internship.client.domain.UserProfile;
-import com.liga.internship.client.service.ImageCreatorService;
-import com.liga.internship.client.service.ProfileService;
-import com.liga.internship.client.service.TextService;
-import com.liga.internship.client.service.V1RestService;
+import com.liga.internship.client.service.*;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
@@ -17,8 +14,8 @@ import java.io.File;
 import java.util.Optional;
 
 import static com.liga.internship.client.bot.BotState.*;
+import static com.liga.internship.client.commons.ButtonCallback.CALLBACK_FEMALE;
 import static com.liga.internship.client.commons.ButtonCallback.CALLBACK_MALE;
-import static com.liga.internship.client.commons.ButtonInput.FEMALE;
 import static com.liga.internship.client.commons.ButtonInput.MALE;
 import static com.liga.internship.client.commons.TextMessage.*;
 
@@ -30,10 +27,12 @@ import static com.liga.internship.client.commons.TextMessage.*;
 @Component
 @AllArgsConstructor
 public class FillProfileHandler implements InputMessageHandler {
-    private final UserDataCache userDataCache;
+    private final ReplyMessageService replyMessageService;
     private final ProfileService profileService;
+    private final UserDataCache userDataCache;
     private final V1RestService v1RestService;
     private final ImageCreatorService imageCreatorService;
+    private final MainMenuService mainMenuService;
     private final TextService textService;
 
     @Override
@@ -69,7 +68,7 @@ public class FillProfileHandler implements InputMessageHandler {
         }
         if (botState.equals(FILLING_PROFILE_ASK_DESCRIBE)) {
             userProfile.setUsername(userAnswer);
-            replyToUser = profileService.getReplyMessage(chatId, MESSAGE_DESCRIBE_YOURSELF);
+            replyToUser = replyMessageService.getReplyMessage(chatId, MESSAGE_DESCRIBE_YOURSELF);
             userDataCache.setUsersCurrentBotState(userId, FILLING_PROFILE_ASK_LOOK);
         }
         if (botState.equals(FILLING_PROFILE_ASK_LOOK)) {
@@ -81,7 +80,7 @@ public class FillProfileHandler implements InputMessageHandler {
             if (userProfile.setLookByButtonCallback(userAnswer)) {
                 userProfile = getRegisteredUserProfile(userProfile);
                 imageWithTextFile = imageCreatorService.getImageWithTextFile(userProfile.getDescription(), userId);
-                replyToUser = profileService.getMainMenuPhotoMessage(chatId, imageWithTextFile, getCaptureFromUserProfile(userProfile));
+                replyToUser = mainMenuService.getMainMenuPhotoMessage(chatId, imageWithTextFile, getCaptureFromUserProfile(userProfile));
                 userDataCache.setUsersCurrentBotState(userId, HANDLER_MAIN_MENU);
             } else {
                 replyToUser = profileService.getMessageWithgetLookGenderChooseKeyboard(chatId, MESSAGE_LOOKFOR);
@@ -95,7 +94,7 @@ public class FillProfileHandler implements InputMessageHandler {
     private PartialBotApiMethod<?> getMessageReplyForAskName(String userAnswer, long userId, long chatId, UserProfile userProfile) {
         PartialBotApiMethod<?> replyToUser;
         if (userProfile.setGenderByButtonCallback(userAnswer)) {
-            replyToUser = profileService.getReplyMessage(chatId, MESSAGE_ENTER_YOUR_NAME);
+            replyToUser = replyMessageService.getReplyMessage(chatId, MESSAGE_ENTER_YOUR_NAME);
             userDataCache.setUsersCurrentBotState(userId, FILLING_PROFILE_ASK_DESCRIBE);
         } else {
             replyToUser = profileService.getMessageWithGenderChooseKeyboard(chatId, MESSAGE_CHOOSE_YOUR_GENDER);
@@ -105,12 +104,21 @@ public class FillProfileHandler implements InputMessageHandler {
     }
 
     private UserProfile getRegisteredUserProfile(UserProfile userProfile) {
-        Optional<UserProfile> optionalNewUser = v1RestService.registerNewUser(userProfile);
-         return optionalNewUser.orElseThrow();
+        if (userProfile.getId() != null) {
+            v1RestService.updateUser(userProfile);
+        } else {
+            Optional<UserProfile> optionalNewUser = v1RestService.registerNewUser(userProfile);
+            if (optionalNewUser.isPresent()) {
+                userProfile = optionalNewUser.get();
+            } else {
+                throw new RuntimeException("user not found");
+            }
+        }
+        return userProfile;
     }
 
     private String getCaptureFromUserProfile(UserProfile userProfile) {
-        String gender = userProfile.getGender().equals(CALLBACK_MALE) ? MALE : FEMALE;
+        String gender = userProfile.getGender().equals(CALLBACK_MALE) ? MALE : CALLBACK_FEMALE;
         String username = textService.translateTextIntoSlavOld(userProfile.getUsername());
         return String.format("%s, %s", gender, username);
     }

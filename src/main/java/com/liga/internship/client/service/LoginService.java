@@ -11,24 +11,14 @@ import java.util.List;
 
 import static com.liga.internship.client.commons.ButtonInput.FILL_FORM;
 
-/**
- * Сервис LoginHandler, предоставляет создание ответов в виде:
- * - сообщение с предложением заполнить анкету
- */
 @Service
 public class LoginService {
-    /**
-     *
-     * @param chatId  - id чата
-     * @param message - текст сообщения
-     * @return SendMessage с кнопкой fill form
-     */
     public SendMessage getMEssageWithFillFormMenu(long chatId, String message) {
-        final ReplyKeyboardMarkup replyKeyboardMarkup = fillFormMenuKeyboard();
+        final ReplyKeyboardMarkup replyKeyboardMarkup = genderChooseMenuKeyboard();
         return createMessageWithKeyboard(chatId, message, replyKeyboardMarkup);
     }
 
-    private ReplyKeyboardMarkup fillFormMenuKeyboard() {
+    private ReplyKeyboardMarkup genderChooseMenuKeyboard() {
         final ReplyKeyboardMarkup replyKeyboardMarkup = getReplyKeyboardMarkup();
         List<KeyboardRow> keyboard = new ArrayList<>();
         KeyboardRow row1 = new KeyboardRow();

@@ -15,19 +15,8 @@ import java.util.List;
 
 import static com.liga.internship.client.commons.ButtonInput.*;
 
-/**
- * Сервис главного меню, предоставляет текстовые и графические сообщения с главным меню
- */
-
 @Service
 public class MainMenuService {
-    /**
-     * Получение текстового сообщения с главным меню
-     *
-     * @param chatId  - id чата
-     * @param message - текст сообщения
-     * @return SendMessage с главным меню
-     */
     public SendMessage getMainMenuMessage(long chatId, String message) {
         final ReplyKeyboard replyKeyboardMarkup = getMainMenuKeyboard();
         return createMessageWithMainMenuKeyboard(chatId, message, replyKeyboardMarkup);
@@ -66,14 +55,6 @@ public class MainMenuService {
         return replyKeyboardMarkup;
     }
 
-    /**
-     * Получение фото сообщения с главным меню
-     *
-     * @param chatId  - id чата
-     * @param image   - прикрепляемое изображение
-     * @param caption - подпись к изображению
-     * @return SendPhoto с главным меню
-     */
     public SendPhoto getMainMenuPhotoMessage(long chatId, File image, String caption) {
         final ReplyKeyboard replyKeyboardMarkup = getMainMenuKeyboard();
         return createPhotoMessageWithKeyboard(chatId, image, caption, replyKeyboardMarkup);

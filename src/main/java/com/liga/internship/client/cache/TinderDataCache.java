@@ -38,8 +38,13 @@ public class TinderDataCache {
      * @param userId - ID активного пользователя(голосующего)
      * @return - кандидат голосования
      */
-    public UserProfile getUserFromVotingProcess(long userId) {
-        return usersInProcess.remove(userId);
+    public Optional<UserProfile> getUserFromVotingProcess(long userId) {
+        UserProfile remove = usersInProcess.remove(userId);
+        if(remove == null) {
+            return  Optional.empty();
+        } else {
+            return  Optional.of(remove);
+        }
     }
 
     /**

@@ -13,8 +13,8 @@ import org.telegram.telegrambots.meta.api.objects.Message;
 
 import java.io.File;
 
-import static com.liga.internship.client.commons.ButtonCallback.CALLBACK_FEMALE;
 import static com.liga.internship.client.commons.ButtonCallback.CALLBACK_MALE;
+import static com.liga.internship.client.commons.ButtonInput.FEMALE;
 import static com.liga.internship.client.commons.ButtonInput.MALE;
 
 /**
@@ -25,7 +25,7 @@ import static com.liga.internship.client.commons.ButtonInput.MALE;
 @AllArgsConstructor
 public class ShowProfileHandler implements InputMessageHandler {
     private final UserDataCache userDataCache;
-    private final ProfileService showProfileService;
+    private final ProfileService profileService;
     private final ImageCreatorService imageCreatorService;
     private final TextService textService;
 
@@ -40,11 +40,12 @@ public class ShowProfileHandler implements InputMessageHandler {
         long chatId = message.getChatId();
         UserProfile userProfile = userDataCache.getUserProfile(userId);
         File imageWithTextFile = imageCreatorService.getImageWithTextFile(userProfile.getDescription(), userId);
-        return showProfileService.getProfileTextMessageWihProfileMenu(chatId, imageWithTextFile, getCaptureFromUserProfile(userProfile));
+        userDataCache.setUsersCurrentBotState(userId, BotState.SHOW_USER_PROFILE);
+        return profileService.getProfileTextMessageWihProfileMenu(chatId, imageWithTextFile, getCaptureFromUserProfile(userProfile));
     }
 
     private String getCaptureFromUserProfile(UserProfile userProfile) {
-        String gender = userProfile.getGender().equals(CALLBACK_MALE) ? MALE : CALLBACK_FEMALE;
+        String gender = userProfile.getGender().equals(CALLBACK_MALE) ? MALE : FEMALE;
         String username = textService.translateTextIntoSlavOld(userProfile.getUsername());
         return String.format("%s, %s", gender, username);
     }

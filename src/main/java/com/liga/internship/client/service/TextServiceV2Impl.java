@@ -1,8 +1,16 @@
 package com.liga.internship.client.service;
 
-public class TranslateToOldSlavService {
+import org.springframework.context.annotation.Primary;
+import org.springframework.stereotype.Service;
 
-    public String translateTextToOldSlav(String srcTxt, String mode) {
+@Service("text-service-2")
+@Primary
+public class TextServiceV2Impl implements TextService {
+
+    @Override
+    public String translateTextIntoSlavOld(String srcTxt) {
+        String mode = " ";
+
         if (srcTxt == null) {
             return " ";
         }
@@ -87,7 +95,7 @@ public class TranslateToOldSlavService {
 
         String newInput = input;
 
-        if (newInput.length() > 2) {
+        if (newInput.length() >= 2) {
             newInput = newInput.replace("ого", "аго");
             newInput = newInput.replace("eго", "аго");
             newInput = newInput.replace("ая", "ыя");
@@ -95,20 +103,14 @@ public class TranslateToOldSlavService {
             newInput = newInput.replace("её", "ея");
             newInput = newInput.replace("ие", "iя");
             newInput = newInput.replace("иё", "iя");
-
-
             newInput = newInput.replace("ии", "iи");
             newInput = newInput.replace("ий", "iи");
-
-
             newInput = newInput.replace("иу", "iу");
             newInput = newInput.replace("иы", "iы");
             newInput = newInput.replace("иа", "iа");
             newInput = newInput.replace("ио", "iо");
             newInput = newInput.replace("иэ", "iэ");
             newInput = newInput.replace("ию", "iю");
-
-
             newInput = newInput.replace("бе", "бѣ");
             newInput = newInput.replace("ве", "вѣ");
             newInput = newInput.replace("вё", "вѣ");
@@ -126,8 +128,6 @@ public class TranslateToOldSlavService {
             newInput = newInput.replace("те", "тѣ");
             newInput = newInput.replace("се", "сѣ");
             newInput = newInput.replace("це", "цѣ");
-
-
             newInput = newInput.replace("Бе", "Бѣ");
             newInput = newInput.replace("Ве", "Вѣ");
             newInput = newInput.replace("Вё", "Вѣ");
@@ -146,15 +146,10 @@ public class TranslateToOldSlavService {
             newInput = newInput.replace("Те", "Тѣ");
             newInput = newInput.replace("Тё", "Тѣ");
             newInput = newInput.replace("Це", "Цѣ");
-
-
             newInput = newInput.replace("Ед", "ѣд");
             newInput = newInput.replace("ед", "ѣд");
-
-
             newInput = newInput.replace("ри", "рi");
             newInput = newInput.replace("ни", "нi");
-
         }
 
         String lastChar = String.valueOf(newInput.charAt(newInput.length() - 1));
@@ -205,13 +200,5 @@ public class TranslateToOldSlavService {
         newInput += lastChar;
 
         return newInput;
-    }
-
-    public static void main(String[] args) {
-        TranslateToOldSlavService translateToOldSlavService = new TranslateToOldSlavService();
-        String input = "К аристократке, истинной аристократке духа. Душа, полная аккордов поэзии, душа, сильная волей, жадная стремлением к деятельной жизни, к самобытности, к творчеству. Найду ли в прекрасной, чарующей улыбке, в тихом сиянии ее глаз оправдание, разгадку мучительного существования?";
-        System.out.println(translateToOldSlavService.translateTextToOldSlav(translateToOldSlavService.translateWordToOldSlav(input), ""));
-        System.out.println();
-        System.out.println(input);
     }
 }

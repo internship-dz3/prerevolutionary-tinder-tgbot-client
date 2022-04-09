@@ -6,7 +6,6 @@ import com.liga.internship.client.domain.UserProfile;
 import com.liga.internship.client.service.ImageCreatorService;
 import com.liga.internship.client.service.ProfileService;
 import com.liga.internship.client.service.TextService;
-import com.liga.internship.client.service.TranslateToOldSlavService;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.meta.api.methods.PartialBotApiMethod;
@@ -29,7 +28,6 @@ public class ShowProfileHandler implements InputMessageHandler {
     private final ProfileService profileService;
     private final ImageCreatorService imageCreatorService;
     private final TextService textService;
-    private final TranslateToOldSlavService translateToOldSlavService;
 
     @Override
     public BotState getHandlerName() {
@@ -48,7 +46,7 @@ public class ShowProfileHandler implements InputMessageHandler {
 
     private String getCaptureFromUserProfile(UserProfile userProfile) {
         String gender = userProfile.getGender().equals(CALLBACK_MALE) ? MALE : FEMALE;
-        String username = translateToOldSlavService.translateTextToOldSlav(userProfile.getUsername(),"");
+        String username = textService.translateTextIntoSlavOld(userProfile.getUsername());
         return String.format("%s, %s", gender, username);
     }
 

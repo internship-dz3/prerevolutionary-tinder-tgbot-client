@@ -35,7 +35,6 @@ public class FillProfileHandler implements InputMessageHandler {
     private final V1RestService v1RestService;
     private final ImageCreatorService imageCreatorService;
     private final TextService textService;
-    private final TranslateToOldSlavService translateToOldSlavService;
 
     @Override
     public BotState getHandlerName() {
@@ -74,9 +73,14 @@ public class FillProfileHandler implements InputMessageHandler {
             userDataCache.setUsersCurrentBotState(userId, FILLING_PROFILE_ASK_LOOK);
         }
         if (botState.equals(FILLING_PROFILE_ASK_LOOK)) {
-            userProfile.setDescription(userAnswer);
-            replyToUser = profileService.getMessageWithgetLookGenderChooseKeyboard(chatId, MESSAGE_LOOKFOR);
-            userDataCache.setUsersCurrentBotState(userId, FILLING_PROFILE_COMPLETE);
+            if (userAnswer.length() > 300) {
+                replyToUser = profileService.getReplyMessage(chatId, MESSAGE_MANY_WORDS);
+                userDataCache.setUsersCurrentBotState(userId, FILLING_PROFILE_ASK_LOOK);
+            } else {
+                userProfile.setDescription(userAnswer);
+                replyToUser = profileService.getMessageWithgetLookGenderChooseKeyboard(chatId, MESSAGE_LOOKFOR);
+                userDataCache.setUsersCurrentBotState(userId, FILLING_PROFILE_COMPLETE);
+            }
         }
         if (botState.equals(FILLING_PROFILE_COMPLETE)) {
             if (userProfile.setLookByButtonCallback(userAnswer)) {
@@ -107,12 +111,12 @@ public class FillProfileHandler implements InputMessageHandler {
 
     private UserProfile getRegisteredUserProfile(UserProfile userProfile) {
         Optional<UserProfile> optionalNewUser = v1RestService.registerNewUser(userProfile);
-         return optionalNewUser.orElseThrow();
+        return optionalNewUser.orElseThrow();
     }
 
     private String getCaptureFromUserProfile(UserProfile userProfile) {
         String gender = userProfile.getGender().equals(CALLBACK_MALE) ? MALE : FEMALE;
-        String username = translateToOldSlavService.translateTextToOldSlav(userProfile.getUsername(),"");
+        String username = textService.translateTextIntoSlavOld(userProfile.getUsername());
         return String.format("%s, %s", gender, username);
     }
 }

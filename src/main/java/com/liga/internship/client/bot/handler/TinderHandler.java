@@ -5,10 +5,7 @@ import com.liga.internship.client.cache.TinderDataCache;
 import com.liga.internship.client.cache.UserDataCache;
 import com.liga.internship.client.domain.UserProfile;
 import com.liga.internship.client.domain.dto.UsersIdTo;
-import com.liga.internship.client.service.ImageCreatorService;
-import com.liga.internship.client.service.TextService;
-import com.liga.internship.client.service.TinderService;
-import com.liga.internship.client.service.V1RestService;
+import com.liga.internship.client.service.*;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
@@ -41,7 +38,6 @@ public class TinderHandler implements InputMessageHandler, InputCallbackHandler 
     private final TinderDataCache tinderDataCache;
     private final V1RestService v1RestService;
     private final TextService textService;
-    private final TranslateToOldSlavService translateToOldSlavService;
 
     @Override
     public BotState getHandlerName() {
@@ -90,7 +86,7 @@ public class TinderHandler implements InputMessageHandler, InputCallbackHandler 
 
     private String getCaptureFromUserProfile(UserProfile userProfile) {
         String gender = userProfile.getGender().equals(CALLBACK_MALE) ? MALE : FEMALE;
-        String username = translateToOldSlavService.translateTextToOldSlav(userProfile.getUsername(),"");
+        String username = textService.translateTextIntoSlavOld(userProfile.getUsername());
         return String.format("%s, %s", gender, username);
     }
 

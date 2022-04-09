@@ -48,7 +48,6 @@ public class LoginHandler implements InputMessageHandler, InputCallbackHandler {
         Optional<UserProfile> userProfile = v1RestService.userLogin(userId);
         if (userProfile.isPresent()) {
             userDataCache.saveUserProfile(userId, userProfile.get());
-            userDataCache.setLoginUser(userId, true);
             userDataCache.setUsersCurrentBotState(userId, HANDLER_MAIN_MENU);
             return mainMenuService.getMainMenuMessage(chatId, MESSAGE_MAIN_MENU);
         } else {

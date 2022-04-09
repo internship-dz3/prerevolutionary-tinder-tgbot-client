@@ -2,89 +2,48 @@ package com.liga.internship.client.service;
 
 public class TranslateToOldSlavService {
 
-    public String translateTextToOldSlav(String srcTxt, String mode) {
-        if (srcTxt == null) {
-            return " ";
-        }
-        if (mode == null) {
-            return " ";
-        }
-
+    public String translateTextToOldSlav(String srcTxt) {
         String[] arrStrParts = srcTxt.split(" ");
         int numOfStringParts = arrStrParts.length;
-        int numOfSymbsInStr;
+        int numOfSymbolsInStr;
 
         String tmpWord;
         StringBuilder tmpResult = new StringBuilder();
 
         int currStrPartNum = 0;
 
-        boolean isChangedBefore = false;
-        boolean isChange;
-
         while (currStrPartNum < numOfStringParts) {
-            if (mode.equals("random")) {
-                if (Math.round(Math.random()) != Math.round(Math.random())) {
-                    tmpResult.append(arrStrParts[currStrPartNum]).append(" ");
-                    currStrPartNum++;
+            numOfSymbolsInStr = arrStrParts[currStrPartNum].length();
 
-                    isChange = false;
-                } else {
-                    isChange = true;
-                }
-            } else if (mode.equals("throne")) {
-                if (isChangedBefore) {
-                    tmpResult.append(arrStrParts[currStrPartNum]).append(" ");
-                    currStrPartNum++;
+            if (numOfSymbolsInStr > 2) {
+                tmpWord = translateWordToOldSlav(arrStrParts[currStrPartNum]);
 
-                    isChange = false;
-                } else {
-                    isChange = true;
+            } else if (numOfSymbolsInStr == 1) {
+                tmpWord = arrStrParts[currStrPartNum];
+
+                if (arrStrParts[currStrPartNum].equals("В") ||
+                        arrStrParts[currStrPartNum].equals("К") ||
+                        arrStrParts[currStrPartNum].equals("С")) {
+                    tmpWord += "ъ";
+                } else if (arrStrParts[currStrPartNum].equals("в") ||
+                        arrStrParts[currStrPartNum].equals("к") ||
+                        arrStrParts[currStrPartNum].equals("с")) {
+                    tmpWord += "ъ";
                 }
+
             } else {
-                isChange = true;
+                tmpWord = arrStrParts[currStrPartNum];
+
             }
-
-            if (isChange) {
-                numOfSymbsInStr = arrStrParts[currStrPartNum].length();
-
-                if (numOfSymbsInStr > 2) {
-                    tmpWord = translateWordToOldSlav(arrStrParts[currStrPartNum]);
-                    isChangedBefore = true;
-                } else if (numOfSymbsInStr == 1) {
-                    tmpWord = arrStrParts[currStrPartNum];
-
-                    if (arrStrParts[currStrPartNum].equals("В") ||
-                            arrStrParts[currStrPartNum].equals("К") ||
-                            arrStrParts[currStrPartNum].equals("С")) {
-                        tmpWord += "ъ";
-                    } else if (arrStrParts[currStrPartNum].equals("в") ||
-                            arrStrParts[currStrPartNum].equals("к") ||
-                            arrStrParts[currStrPartNum].equals("с")) {
-                        tmpWord += "ъ";
-                    }
-                    isChangedBefore = true;
-                } else {
-                    tmpWord = arrStrParts[currStrPartNum];
-                    isChangedBefore = false;
-                }
-                if (tmpWord.equals(tmpWord)) {
-                    if (tmpResult.toString().equals(tmpResult.toString()))
-                        tmpResult.append(tmpWord).append(" ");
-                    else
-                        tmpResult.append(tmpWord);
-                }
-                currStrPartNum++;
-            } else {
-                isChangedBefore = false;
-            }
+            tmpResult.append(tmpWord).append(" ");
+            currStrPartNum++;
         }
         return tmpResult.toString();
     }
 
     public String translateWordToOldSlav(String input) {
-        String curChar;
 
+        String curChar;
         String newInput = input;
 
         if (newInput.length() > 2) {
@@ -96,10 +55,8 @@ public class TranslateToOldSlavService {
             newInput = newInput.replace("ие", "iя");
             newInput = newInput.replace("иё", "iя");
 
-
             newInput = newInput.replace("ии", "iи");
             newInput = newInput.replace("ий", "iи");
-
 
             newInput = newInput.replace("иу", "iу");
             newInput = newInput.replace("иы", "iы");
@@ -107,7 +64,6 @@ public class TranslateToOldSlavService {
             newInput = newInput.replace("ио", "iо");
             newInput = newInput.replace("иэ", "iэ");
             newInput = newInput.replace("ию", "iю");
-
 
             newInput = newInput.replace("бе", "бѣ");
             newInput = newInput.replace("ве", "вѣ");
@@ -126,7 +82,6 @@ public class TranslateToOldSlavService {
             newInput = newInput.replace("те", "тѣ");
             newInput = newInput.replace("се", "сѣ");
             newInput = newInput.replace("це", "цѣ");
-
 
             newInput = newInput.replace("Бе", "Бѣ");
             newInput = newInput.replace("Ве", "Вѣ");
@@ -147,14 +102,11 @@ public class TranslateToOldSlavService {
             newInput = newInput.replace("Тё", "Тѣ");
             newInput = newInput.replace("Це", "Цѣ");
 
-
             newInput = newInput.replace("Ед", "ѣд");
             newInput = newInput.replace("ед", "ѣд");
 
-
             newInput = newInput.replace("ри", "рi");
             newInput = newInput.replace("ни", "нi");
-
         }
 
         String lastChar = String.valueOf(newInput.charAt(newInput.length() - 1));
@@ -209,8 +161,8 @@ public class TranslateToOldSlavService {
 
     public static void main(String[] args) {
         TranslateToOldSlavService translateToOldSlavService = new TranslateToOldSlavService();
-        String input = "К аристократке, истинной аристократке духа. Душа, полная аккордов поэзии, душа, сильная волей, жадная стремлением к деятельной жизни, к самобытности, к творчеству. Найду ли в прекрасной, чарующей улыбке, в тихом сиянии ее глаз оправдание, разгадку мучительного существования?";
-        System.out.println(translateToOldSlavService.translateTextToOldSlav(translateToOldSlavService.translateWordToOldSlav(input), ""));
+        String input = "Найду ли в прекрасной, чарующей улыбке, в тихом сиянии ее глаз оправдание, разгадку мучительного существования?";
+        System.out.println(translateToOldSlavService.translateTextToOldSlav(translateToOldSlavService.translateWordToOldSlav(input)));
         System.out.println();
         System.out.println(input);
     }

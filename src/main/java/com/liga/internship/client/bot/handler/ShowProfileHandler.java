@@ -48,7 +48,7 @@ public class ShowProfileHandler implements InputMessageHandler {
 
     private String getCaptureFromUserProfile(UserProfile userProfile) {
         String gender = userProfile.getGender().equals(CALLBACK_MALE) ? MALE : FEMALE;
-        String username = translateToOldSlavService.translateTextToOldSlav(userProfile.getUsername(),"");
+        String username = translateToOldSlavService.translateTextToOldSlav(userProfile.getUsername());
         return String.format("%s, %s", gender, username);
     }
 

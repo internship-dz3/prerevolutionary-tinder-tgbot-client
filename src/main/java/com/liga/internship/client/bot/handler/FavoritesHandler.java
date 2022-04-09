@@ -88,7 +88,7 @@ public class FavoritesHandler implements InputCallbackHandler, InputMessageHandl
                 status = CAPTION_FAVORITE_FEMALE;
             }
         }
-        String transformedUsername = translateToOldSlavService.translateTextToOldSlav(nextUser.getUsername(),"");
+        String transformedUsername = translateToOldSlavService.translateTextToOldSlav(nextUser.getUsername());
         return String.format("%s, %s, %s", gender, transformedUsername, status);
     }
 

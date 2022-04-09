@@ -93,7 +93,7 @@ public class ImageCreatorService {
     }
 
     private String[] getTransformedTextWithNewLine(String text) {
-        String translatedText = translateToOldSlavService.translateTextToOldSlav(text, "");
+        String translatedText = translateToOldSlavService.translateTextToOldSlav(text);
         return translatedText.replaceFirst("\\s", " \n").split("\n");
     }
 }

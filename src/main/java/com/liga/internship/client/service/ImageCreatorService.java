@@ -21,6 +21,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
+/**
+ * Сервис создания изображения профиля пользователя, с указанным переведенным текстом
+ */
 @Service
 @RequiredArgsConstructor
 public class ImageCreatorService {
@@ -28,16 +31,23 @@ public class ImageCreatorService {
     private final TranslateToOldSlavService translateToOldSlavService;
 
     @Value("${message.background}")
-    private Resource resource;
+    private Resource backgroundImageResourse;
+    //папка хранящее изображения сообщений пользователя
     @Value("${temp.folder}")
-    private Path folderPath;
+    private Path tempUserImagesFolderPath;
 
-    public File getImageWithTextFile(String description, long userId) {
+    /**
+     * @param text   -текст наносимый на картинку
+     * @param userId - id профиля пользователя
+     * @return File с картинкой
+     */
+    public File getImageWithTextFile(String text, long userId) {
         File trend = null;
         try {
-            BufferedImage bufferedImage = getImageWithText(description);
-            Files.createDirectories(folderPath);
-            trend = new File(String.format("%s/image%d.jpg", folderPath.toString(), userId));
+            String translatedText = textService.translateTextIntoSlavOld(text);
+            BufferedImage bufferedImage = getImageWithText(translatedText);
+            Files.createDirectories(tempUserImagesFolderPath);
+            trend = new File(String.format("%s/image%d.jpg", tempUserImagesFolderPath.toString(), userId));
             ImageIO.write(bufferedImage, "jpg", trend);
         } catch (IOException e) {
             e.printStackTrace();
@@ -49,7 +59,7 @@ public class ImageCreatorService {
         String[] formatted = getTransformedTextWithNewLine(text);
         BufferedImage image = null;
         try {
-            image = ImageIO.read(resource.getInputStream());
+            image = ImageIO.read(backgroundImageResourse.getInputStream());
             Font headerFont = new Font("Old Standard TT", Font.BOLD, 55);
             Font descriptionFont = new Font("Old Standard TT", Font.PLAIN, 24);
             Rectangle rect = new Rectangle(image.getWidth(), image.getHeight());
@@ -94,6 +104,6 @@ public class ImageCreatorService {
 
     private String[] getTransformedTextWithNewLine(String text) {
         String translatedText = translateToOldSlavService.translateTextToOldSlav(text, "");
-        return translatedText.replaceFirst("\\s", " \n").split("\n");
+        return text.replaceFirst("\\s+", " \n").split("\n");
     }
 }

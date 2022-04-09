@@ -6,9 +6,19 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 import java.util.stream.Collectors;
 
+/**
+ * Сервис перевода русского текста в старославянский стиль
+ *
+ * <a href="https://docs.google.com/document/d/1xL9KkbWAAHp9ZnTEjAEZ8NuImfXQ4dJuEOEJf_LykhI/edit">Правила перевода текста в дореформенной русской орфографии</a>
+ */
 @Service
 public class TextService {
-
+    /**
+     * Метод возвращающий переведенный текст на старославянский
+     *
+     * @param text - вводимый текст на русском языке
+     * @return переведнный текст согласно условиям
+     */
     public String translateTextIntoSlavOld(String text) {
         List<String> list = List.of(text.split(" "));
         List<String> modifiedList = list.stream().map(this::modifyEndOfTheWord).collect(Collectors.toList());
@@ -24,7 +34,7 @@ public class TextService {
         if (!symbol.equals("")) {
             word = removeLastChar(word);
         }
-        if(word == null || word.isBlank()) {
+        if (word == null || word.isBlank()) {
             return "";
         }
         if (modifiableLetters.contains(String.valueOf(word.charAt(word.length() - 1)))) {
@@ -38,7 +48,7 @@ public class TextService {
     }
 
     private String getLastSymbolIfExists(String word) {
-        if(word.isEmpty()) {
+        if (word.isEmpty()) {
             return "";
         }
         List<String> symbols = List.of("?", ":", ";", "-", " ");

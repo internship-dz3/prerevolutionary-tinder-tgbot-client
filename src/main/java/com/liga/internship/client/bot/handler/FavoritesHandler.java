@@ -32,6 +32,9 @@ public class FavoritesHandler implements InputCallbackHandler, InputMessageHandl
     private final V1RestService v1RestService;
     private final FavoritesService favoritesService;
     private final ImageCreatorService imageCreatorService;
+    private final FavoritesDataCache favoritesDataCache;
+    private final MainMenuService mainMenuService;
+    private final TranslateToOldSlavService translateToOldSlavService;
     private final TextService textService;
 
     @Override
@@ -86,7 +89,7 @@ public class FavoritesHandler implements InputCallbackHandler, InputMessageHandl
                 status = CAPTION_FAVORITE_FEMALE;
             }
         }
-        String transformedUsername = textService.translateTextIntoSlavOld(nextUser.getUsername());
+        String transformedUsername = translateToOldSlavService.translateTextToOldSlav(nextUser.getUsername(),"");
         return String.format("%s, %s, %s", gender, transformedUsername, status);
     }
 

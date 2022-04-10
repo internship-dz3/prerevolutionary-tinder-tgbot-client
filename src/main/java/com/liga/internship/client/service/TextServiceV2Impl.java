@@ -3,6 +3,11 @@ package com.liga.internship.client.service;
 import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Service;
 
+/**
+ * Сервис перевода русского текста в старославянский стиль
+ * Версия 2
+ * <a href="https://docs.google.com/document/d/1xL9KkbWAAHp9ZnTEjAEZ8NuImfXQ4dJuEOEJf_LykhI/edit">Правила перевода текста в дореформенной русской орфографии</a>
+ */
 @Service("text-service-2")
 @Primary
 public class TextServiceV2Impl implements TextService {

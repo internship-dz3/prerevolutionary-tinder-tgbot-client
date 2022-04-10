@@ -5,8 +5,6 @@ import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.methods.send.SendPhoto;
-import org.telegram.telegrambots.meta.api.objects.InputFile;
-import org.telegram.telegrambots.meta.api.objects.replykeyboard.ReplyKeyboard;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.ReplyKeyboardMarkup;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.KeyboardButton;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.KeyboardRow;
@@ -27,6 +25,7 @@ import static com.liga.internship.client.commons.ButtonInput.*;
 @AllArgsConstructor
 public class ProfileService {
     private final MainMenuService mainMenuService;
+    private final ReplyService replyService;
 
     /**
      * Графическое сообщение с главным меню
@@ -49,7 +48,36 @@ public class ProfileService {
      */
     public SendMessage getMessageWithGenderChooseKeyboard(long chatId, String message) {
         final ReplyKeyboardMarkup replyKeyboardMarkup = genderChooseMenuKeyboard();
-        return createMessageWithKeyboard(chatId, message, replyKeyboardMarkup);
+        return replyService.createMessageWithKeyboard(chatId, message, replyKeyboardMarkup);
+    }
+
+    /**
+     * Текстовое сообщение с меню для выбора поиска гендера
+     *
+     * @param chatId  - id чата
+     * @param message - текстовое сообщение
+     * @return SendMessage с меню для выбора поиска гендера
+     */
+    public SendMessage getMessageWithgetLookGenderChooseKeyboard(long chatId, String message) {
+        final ReplyKeyboardMarkup replyKeyboardMarkup = lookGenderChooseKeyboard();
+        return replyService.createMessageWithKeyboard(chatId, message, replyKeyboardMarkup);
+    }
+
+    /**
+     * Сообщение с профилем активного пользователя
+     *
+     * @param chatId  -id чата
+     * @param image   - изображение профиля
+     * @param caption - подпись к изображению
+     * @return SendPhoto c меню профиля
+     */
+    public SendPhoto getProfileTextMessageWihProfileMenu(long chatId, File image, String caption) {
+        final ReplyKeyboardMarkup replyKeyboardMarkup = getProfileMenuKeyboard();
+        return replyService.createPhotoMessageWithKeyboard(chatId, image, caption, replyKeyboardMarkup);
+    }
+
+    public SendMessage getReplyMessage(long chatId, String message) {
+        return replyService.getReplyMessage(chatId, message);
     }
 
     private ReplyKeyboardMarkup genderChooseMenuKeyboard() {
@@ -65,35 +93,25 @@ public class ProfileService {
         return replyKeyboardMarkup;
     }
 
+    private ReplyKeyboardMarkup getProfileMenuKeyboard() {
+        final ReplyKeyboardMarkup replyKeyboardMarkup = getReplyKeyboardMarkup(false);
+        List<KeyboardRow> keyboard = new ArrayList<>();
+        KeyboardRow row1 = new KeyboardRow();
+        KeyboardRow row2 = new KeyboardRow();
+        row1.add(new KeyboardButton(CHANGE_PROFILE));
+        row2.add(new KeyboardButton(ButtonInput.MAIN_MENU));
+        keyboard.add(row1);
+        keyboard.add(row2);
+        replyKeyboardMarkup.setKeyboard(keyboard);
+        return replyKeyboardMarkup;
+    }
+
     private ReplyKeyboardMarkup getReplyKeyboardMarkup(boolean oneTime) {
         final ReplyKeyboardMarkup replyKeyboardMarkup = new ReplyKeyboardMarkup();
         replyKeyboardMarkup.setSelective(true);
         replyKeyboardMarkup.setResizeKeyboard(true);
         replyKeyboardMarkup.setOneTimeKeyboard(oneTime);
         return replyKeyboardMarkup;
-    }
-
-    private SendMessage createMessageWithKeyboard(long chatId, String message, ReplyKeyboardMarkup replyKeyboardMarkup) {
-        final SendMessage sendMessage = new SendMessage();
-        sendMessage.enableMarkdown(true);
-        sendMessage.setChatId(String.valueOf(chatId));
-        sendMessage.setText(message);
-        if (replyKeyboardMarkup != null) {
-            sendMessage.setReplyMarkup(replyKeyboardMarkup);
-        }
-        return sendMessage;
-    }
-
-    /**
-     * Текстовое сообщение с меню для выбора поиска гендера
-     *
-     * @param chatId  - id чата
-     * @param message - текстовое сообщение
-     * @return SendMessage с меню для выбора поиска гендера
-     */
-    public SendMessage getMessageWithgetLookGenderChooseKeyboard(long chatId, String message) {
-        final ReplyKeyboardMarkup replyKeyboardMarkup = lookGenderChooseKeyboard();
-        return createMessageWithKeyboard(chatId, message, replyKeyboardMarkup);
     }
 
     private ReplyKeyboardMarkup lookGenderChooseKeyboard() {
@@ -110,49 +128,4 @@ public class ProfileService {
         return replyKeyboardMarkup;
     }
 
-    /**
-     * Сообщение с профилем активного пользователя
-     *
-     * @param chatId  -id чата
-     * @param image   - изображение профиля
-     * @param caption - подпись к изображению
-     * @return SendPhoto c меню профиля
-     */
-    public SendPhoto getProfileTextMessageWihProfileMenu(long chatId, File image, String caption) {
-        final ReplyKeyboardMarkup replyKeyboardMarkup = getProfileMenuKeyboard();
-        return createPhotoMessageWithKeyboard(chatId, image, caption, replyKeyboardMarkup);
-    }
-
-    private ReplyKeyboardMarkup getProfileMenuKeyboard() {
-        final ReplyKeyboardMarkup replyKeyboardMarkup = getReplyKeyboardMarkup(false);
-        List<KeyboardRow> keyboard = new ArrayList<>();
-        KeyboardRow row1 = new KeyboardRow();
-        KeyboardRow row2 = new KeyboardRow();
-        row1.add(new KeyboardButton(CHANGE_PROFILE));
-        row2.add(new KeyboardButton(ButtonInput.MAIN_MENU));
-        keyboard.add(row1);
-        keyboard.add(row2);
-        replyKeyboardMarkup.setKeyboard(keyboard);
-        return replyKeyboardMarkup;
-    }
-
-    private SendPhoto createPhotoMessageWithKeyboard(long chatId, File image, String caption, ReplyKeyboard replyKeyboardMarkup) {
-        return SendPhoto.builder()
-                .photo(new InputFile(image))
-                .chatId(String.valueOf(chatId))
-                .replyMarkup(replyKeyboardMarkup)
-                .caption(caption)
-                .build();
-    }
-
-    /**
-     * Текстовое сообщение
-     *
-     * @param chatId  - id чата
-     * @param message - текстовое сообщение
-     * @return SedMessage
-     */
-    public SendMessage getReplyMessage(Long chatId, String message) {
-        return new SendMessage(chatId.toString(), message);
-    }
 }

@@ -17,6 +17,7 @@ public class ButtonInput {
     public static final String ADMIRER = "Я любимец";
     public static final String LOVE = "Взаимность";
     public static final String FILL_FORM = "Заполнить анкету";
+
     private ButtonInput() {
     }
 }

@@ -8,7 +8,7 @@ import java.util.stream.Collectors;
 
 /**
  * Сервис перевода русского текста в старославянский стиль
-
+ * Версия 1
  * <a href="https://docs.google.com/document/d/1xL9KkbWAAHp9ZnTEjAEZ8NuImfXQ4dJuEOEJf_LykhI/edit">Правила перевода текста в дореформенной русской орфографии</a>
  */
 @Service("text-service-1")
@@ -21,6 +21,18 @@ public class TextServiceV1Impl implements TextService {
         StringBuilder result = new StringBuilder();
         modifiedList.forEach(result::append);
         return replaceEandI(new StringBuilder(result)).toString();
+    }
+
+    private String getLastSymbolIfExists(String word) {
+        if (word.isEmpty()) {
+            return "";
+        }
+        List<String> symbols = List.of("?", ":", ";", "-", " ");
+        String lastChar = String.valueOf(word.charAt(word.length() - 1));
+        if (symbols.contains(lastChar)) {
+            return lastChar;
+        } else
+            return "";
     }
 
     private String modifyEndOfTheWord(String word) {
@@ -41,18 +53,6 @@ public class TextServiceV1Impl implements TextService {
 
     private String removeLastChar(String s) {
         return (s == null || s.length() == 0) ? null : (s.substring(0, s.length() - 1));
-    }
-
-    private String getLastSymbolIfExists(String word) {
-        if (word.isEmpty()) {
-            return "";
-        }
-        List<String> symbols = List.of("?", ":", ";", "-", " ");
-        String lastChar = String.valueOf(word.charAt(word.length() - 1));
-        if (symbols.contains(lastChar)) {
-            return lastChar;
-        } else
-            return "";
     }
 
     private StringBuilder replaceEandI(StringBuilder text) {

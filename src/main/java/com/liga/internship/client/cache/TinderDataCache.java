@@ -40,10 +40,10 @@ public class TinderDataCache {
      */
     public Optional<UserProfile> getUserFromVotingProcess(long userId) {
         UserProfile remove = usersInProcess.remove(userId);
-        if(remove == null) {
-            return  Optional.empty();
+        if (remove == null) {
+            return Optional.empty();
         } else {
-            return  Optional.of(remove);
+            return Optional.of(remove);
         }
     }
 
@@ -59,7 +59,7 @@ public class TinderDataCache {
     /**
      * Внесения списка голосования в кэш
      *
-     * @param userId - ID активного пользователя(голосующего)
+     * @param userId       - ID активного пользователя(голосующего)
      * @param userProfiles - список кандидатов голосования
      */
     public void setProcessDataList(Long userId, List<UserProfile> userProfiles) {
@@ -68,7 +68,8 @@ public class TinderDataCache {
 
     /**
      * Внесение в кэш кандидата голосования
-     * @param userId - ID активного пользователя(голосующего)
+     *
+     * @param userId        - ID активного пользователя(голосующего)
      * @param userInProcess - кандидат голосования
      */
     public void setUserToVotingProcess(long userId, UserProfile userInProcess) {

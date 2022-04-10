@@ -1,5 +1,6 @@
 package com.liga.internship.client.service;
 
+import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.ReplyKeyboardMarkup;
@@ -16,16 +17,18 @@ import static com.liga.internship.client.commons.ButtonInput.FILL_FORM;
  * - сообщение с предложением заполнить анкету
  */
 @Service
+@AllArgsConstructor
 public class LoginService {
+    private final ReplyService replyService;
+
     /**
-     *
      * @param chatId  - id чата
      * @param message - текст сообщения
      * @return SendMessage с кнопкой fill form
      */
-    public SendMessage getMEssageWithFillFormMenu(long chatId, String message) {
+    public SendMessage getMessageWithFillFormMenu(long chatId, String message) {
         final ReplyKeyboardMarkup replyKeyboardMarkup = fillFormMenuKeyboard();
-        return createMessageWithKeyboard(chatId, message, replyKeyboardMarkup);
+        return replyService.createMessageWithKeyboard(chatId, message, replyKeyboardMarkup);
     }
 
     private ReplyKeyboardMarkup fillFormMenuKeyboard() {
@@ -44,16 +47,5 @@ public class LoginService {
         replyKeyboardMarkup.setResizeKeyboard(true);
         replyKeyboardMarkup.setOneTimeKeyboard(false);
         return replyKeyboardMarkup;
-    }
-
-    private SendMessage createMessageWithKeyboard(long chatId, String message, ReplyKeyboardMarkup replyKeyboardMarkup) {
-        final SendMessage sendMessage = new SendMessage();
-        sendMessage.enableMarkdown(true);
-        sendMessage.setChatId(String.valueOf(chatId));
-        sendMessage.setText(message);
-        if (replyKeyboardMarkup != null) {
-            sendMessage.setReplyMarkup(replyKeyboardMarkup);
-        }
-        return sendMessage;
     }
 }

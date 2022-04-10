@@ -10,8 +10,8 @@ import org.telegram.telegrambots.meta.api.objects.CallbackQuery;
 import org.telegram.telegrambots.meta.api.objects.Message;
 
 import static com.liga.internship.client.bot.BotState.HANDLER_LOGIN;
-import static com.liga.internship.client.commons.TextMessage.MESSAGE_COMEBACK;
-import static com.liga.internship.client.commons.TextMessage.MESSAGE_MAIN_MENU;
+import static com.liga.internship.client.commons.Constant.MESSAGE_COMEBACK;
+import static com.liga.internship.client.commons.Constant.MESSAGE_MAIN_MENU;
 
 /**
  * Обработчик входящих Message и CallbackQuery сообщений телеграм бота, связанных с отображением главного меню.

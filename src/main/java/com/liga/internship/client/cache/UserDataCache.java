@@ -22,11 +22,7 @@ public class UserDataCache {
      * @return Optional.empty() если данный пользватель отсутствует в кэше
      */
     public UserProfile getUserProfile(long userId) {
-        UserProfile activeUserProfile = userProfileMap.get(userId);
-        if (activeUserProfile == null) {
-            return new UserProfile();
-        }
-        return activeUserProfile;
+        return userProfileMap.get(userId);
     }
 
     /**
@@ -37,7 +33,7 @@ public class UserDataCache {
      */
     public BotState getUsersCurrentBotState(long userId) {
         BotState botState = userBotStates.get(userId);
-        if (botState == null) {
+        if (botState == null || userProfileMap.get(userId) == null) {
             botState = BotState.HANDLER_LOGIN;
         }
         return botState;

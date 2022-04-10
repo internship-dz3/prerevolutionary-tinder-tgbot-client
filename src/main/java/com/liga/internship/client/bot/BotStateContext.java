@@ -7,14 +7,14 @@ import org.telegram.telegrambots.meta.api.methods.PartialBotApiMethod;
 import org.telegram.telegrambots.meta.api.objects.CallbackQuery;
 import org.telegram.telegrambots.meta.api.objects.Message;
 
-import java.util.HashMap;
+import java.util.EnumMap;
 import java.util.List;
 import java.util.Map;
 
 @Component
 public class BotStateContext {
-    private final Map<BotState, InputMessageHandler> inputHandlers = new HashMap<>();
-    private final Map<BotState, InputCallbackHandler> callbackHandlers = new HashMap<>();
+    private final Map<BotState, InputMessageHandler> inputHandlers = new EnumMap<>(BotState.class);
+    private final Map<BotState, InputCallbackHandler> callbackHandlers = new EnumMap<>(BotState.class);
 
     public BotStateContext(List<InputMessageHandler> inputMessageHandlers,
                            List<InputCallbackHandler> inputCallbackHandlers) {
@@ -25,6 +25,11 @@ public class BotStateContext {
     public PartialBotApiMethod<?> processInputCallback(BotState currentState, CallbackQuery callbackQuery) {
         InputCallbackHandler currentInputCallbackHandler = findCallbackHandler(currentState);
         return currentInputCallbackHandler.handleCallback(callbackQuery);
+    }
+
+    public PartialBotApiMethod<?> processInputMessage(BotState currentState, Message message) {
+        InputMessageHandler currentInputMessageHandler = findMessageHandler(currentState);
+        return currentInputMessageHandler.handleMessage(message);
     }
 
     private InputCallbackHandler findCallbackHandler(BotState currentState) {
@@ -40,26 +45,17 @@ public class BotStateContext {
         return callbackHandlers.get(currentState);
     }
 
-    private boolean isVotingState(BotState currentState) {
-        switch (currentState) {
-            case HANDLER_TINDER:
-            case CONTINUE_VOTING:
-            case STOP_VOTING:
-                return true;
-            default:
-                return false;
+    private InputMessageHandler findMessageHandler(BotState currentState) {
+        if (isFillingProfileState(currentState)) {
+            return inputHandlers.get(BotState.HANDLER_PROFILE_FILLING);
         }
-    }
-
-    private boolean isShowFavoritesState(BotState currentState) {
-        switch (currentState) {
-            case SHOW_NEXT_FAVORITE:
-            case SHOW_PREV_FAVORITE:
-            case HANDLER_SHOW_FAVORITES:
-                return true;
-            default:
-                return false;
+        if (isVotingState(currentState)) {
+            return inputHandlers.get(BotState.HANDLER_TINDER);
         }
+        if (isShowFavoritesState(currentState)) {
+            return inputHandlers.get(BotState.HANDLER_SHOW_FAVORITES);
+        }
+        return inputHandlers.get(currentState);
     }
 
     private boolean isFillingProfileState(BotState currentState) {
@@ -77,21 +73,25 @@ public class BotStateContext {
         }
     }
 
-    public PartialBotApiMethod<?> processInputMessage(BotState currentState, Message message) {
-        InputMessageHandler currentInputMessageHandler = findMessageHandler(currentState);
-        return currentInputMessageHandler.handleMessage(message);
+    private boolean isShowFavoritesState(BotState currentState) {
+        switch (currentState) {
+            case SHOW_NEXT_FAVORITE:
+            case SHOW_PREV_FAVORITE:
+            case HANDLER_SHOW_FAVORITES:
+                return true;
+            default:
+                return false;
+        }
     }
 
-    private InputMessageHandler findMessageHandler(BotState currentState) {
-        if (isFillingProfileState(currentState)) {
-            return inputHandlers.get(BotState.HANDLER_PROFILE_FILLING);
+    private boolean isVotingState(BotState currentState) {
+        switch (currentState) {
+            case HANDLER_TINDER:
+            case CONTINUE_VOTING:
+            case STOP_VOTING:
+                return true;
+            default:
+                return false;
         }
-        if (isVotingState(currentState)) {
-            return inputHandlers.get(BotState.HANDLER_TINDER);
-        }
-        if (isShowFavoritesState(currentState)) {
-            return inputHandlers.get(BotState.HANDLER_SHOW_FAVORITES);
-        }
-        return inputHandlers.get(currentState);
     }
 }

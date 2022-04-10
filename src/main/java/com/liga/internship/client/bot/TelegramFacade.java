@@ -32,20 +32,6 @@ public class TelegramFacade {
         return sendMessage;
     }
 
-    private PartialBotApiMethod<?> handleCallbackQuery(CallbackQuery callbackQuery) {
-        long userId = callbackQuery.getFrom().getId();
-        return botStateContext.processInputCallback(userDataCache.getUsersCurrentBotState(userId), callbackQuery);
-    }
-
-    private PartialBotApiMethod<?> handleInputMessage(Message message) {
-        String inputMsg = message.getText();
-        long userId = message.getFrom().getId();
-        BotState botState;
-        botState = getBotState(inputMsg, userId);
-        userDataCache.setUsersCurrentBotState(userId, botState);
-        return botStateContext.processInputMessage(botState, message);
-    }
-
     private BotState getBotState(String inputMsg, long userId) {
         BotState botState;
         switch (inputMsg) {
@@ -75,5 +61,19 @@ public class TelegramFacade {
                 break;
         }
         return botState;
+    }
+
+    private PartialBotApiMethod<?> handleCallbackQuery(CallbackQuery callbackQuery) {
+        long userId = callbackQuery.getFrom().getId();
+        BotState botState = userDataCache.getUsersCurrentBotState(userId);
+        return botStateContext.processInputCallback(botState, callbackQuery);
+    }
+
+    private PartialBotApiMethod<?> handleInputMessage(Message message) {
+        String inputMsg = message.getText();
+        long userId = message.getFrom().getId();
+        BotState botState = getBotState(inputMsg, userId);
+        userDataCache.setUsersCurrentBotState(userId, botState);
+        return botStateContext.processInputMessage(botState, message);
     }
 }

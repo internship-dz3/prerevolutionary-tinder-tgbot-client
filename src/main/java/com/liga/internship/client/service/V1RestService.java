@@ -79,11 +79,10 @@ public class V1RestService {
      * @return список поклонников
      */
     public List<UserProfile> getNotRatedUsers(Long id) {
-        return webClient.post()
+        return webClient.get()
                 .uri(uriBuilder -> uriBuilder.path(GET_NOT_RATED_LIST)
-                        .build())
+                        .build(id))
                 .header(CONTENT_TYPE, APPLICATION_JSON_VALUE)
-                .body(Mono.just(id), Long.class)
                 .retrieve()
                 .bodyToFlux(UserProfile.class)
                 .collectList()
@@ -130,20 +129,20 @@ public class V1RestService {
      *
      * @param usersIdTo - дто айдишников
      */
-    public void sendLikeRequest(UsersIdTo usersIdTo) {
-        webClient.post()
+    public boolean sendLikeRequest(UsersIdTo usersIdTo) {
+        return Boolean.TRUE.equals(webClient.post()
                 .uri(uriBuilder -> uriBuilder.path(POST_LIKE)
                         .build())
                 .header(CONTENT_TYPE, APPLICATION_JSON_VALUE)
                 .body(Mono.just(usersIdTo), UsersIdTo.class)
                 .retrieve()
                 .bodyToMono(Boolean.class)
-                .block();
+                .block());
     }
 
     /**
      * Обновление существующего пользователя
-     *  d
+     *
      * @param userProfile - профиль существующего профиля
      */
     public void updateUser(UserProfile userProfile) {

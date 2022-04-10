@@ -2,6 +2,8 @@ package com.liga.internship.client.bot.handler;
 
 import com.liga.internship.client.bot.BotState;
 import com.liga.internship.client.cache.UserDataCache;
+import com.liga.internship.client.commons.ButtonInput;
+import com.liga.internship.client.commons.Constant;
 import com.liga.internship.client.domain.UserProfile;
 import com.liga.internship.client.service.ImageCreatorService;
 import com.liga.internship.client.service.ProfileService;
@@ -38,10 +40,16 @@ public class ShowProfileHandler implements InputMessageHandler {
     public PartialBotApiMethod<?> handleMessage(Message message) {
         long userId = message.getFrom().getId();
         long chatId = message.getChatId();
+        String userInput = message.getText();
         UserProfile userProfile = userDataCache.getUserProfile(userId);
-        File imageWithTextFile = imageCreatorService.getImageWithTextFile(userProfile.getDescription(), userId);
-        userDataCache.setUsersCurrentBotState(userId, BotState.SHOW_USER_PROFILE);
-        return profileService.getProfileTextMessageWihProfileMenu(chatId, imageWithTextFile, getCaptureFromUserProfile(userProfile));
+        if (userInput.equals(ButtonInput.USERFORM) && userProfile != null) {
+            File imageWithTextFile = imageCreatorService.getImageWithTextFile(userProfile.getDescription(), userId);
+            userDataCache.setUsersCurrentBotState(userId, BotState.SHOW_USER_PROFILE);
+            return profileService.getProfileTextMessageWihProfileMenu(chatId, imageWithTextFile, getCaptureFromUserProfile(userProfile));
+        }
+
+        userDataCache.setUsersCurrentBotState(userId, BotState.HANDLER_LOGIN);
+        return profileService.getReplyMessage(chatId, Constant.MESSAGE_COMEBACK);
     }
 
     private String getCaptureFromUserProfile(UserProfile userProfile) {
@@ -49,5 +57,4 @@ public class ShowProfileHandler implements InputMessageHandler {
         String username = textService.translateTextIntoSlavOld(userProfile.getUsername());
         return String.format("%s, %s", gender, username);
     }
-
 }

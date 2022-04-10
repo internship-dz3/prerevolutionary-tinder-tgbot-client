@@ -1,9 +1,9 @@
 package com.liga.internship.client.service;
 
+import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.methods.send.SendPhoto;
-import org.telegram.telegrambots.meta.api.objects.InputFile;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.ReplyKeyboard;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.ReplyKeyboardMarkup;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.KeyboardButton;
@@ -20,7 +20,10 @@ import static com.liga.internship.client.commons.ButtonInput.*;
  */
 
 @Service
+@AllArgsConstructor
 public class MainMenuService {
+    private final ReplyService replyService;
+
     /**
      * Получение текстового сообщения с главным меню
      *
@@ -30,18 +33,20 @@ public class MainMenuService {
      */
     public SendMessage getMainMenuMessage(long chatId, String message) {
         final ReplyKeyboard replyKeyboardMarkup = getMainMenuKeyboard();
-        return createMessageWithMainMenuKeyboard(chatId, message, replyKeyboardMarkup);
+        return replyService.createMessageWithKeyboard(chatId, message, replyKeyboardMarkup);
     }
 
-    private SendMessage createMessageWithMainMenuKeyboard(long chatId, String message, ReplyKeyboard replyKeyboardMarkup) {
-        final SendMessage sendMessage = new SendMessage();
-        sendMessage.enableMarkdown(true);
-        sendMessage.setChatId(String.valueOf(chatId));
-        sendMessage.setText(message);
-        if (replyKeyboardMarkup != null) {
-            sendMessage.setReplyMarkup(replyKeyboardMarkup);
-        }
-        return sendMessage;
+    /**
+     * Получение фото сообщения с главным меню
+     *
+     * @param chatId  - id чата
+     * @param image   - прикрепляемое изображение
+     * @param caption - подпись к изображению
+     * @return SendPhoto с главным меню
+     */
+    public SendPhoto getMainMenuPhotoMessage(long chatId, File image, String caption) {
+        final ReplyKeyboard replyKeyboardMarkup = getMainMenuKeyboard();
+        return replyService.createPhotoMessageWithKeyboard(chatId, image, caption, replyKeyboardMarkup);
     }
 
     private ReplyKeyboard getMainMenuKeyboard() {
@@ -64,27 +69,5 @@ public class MainMenuService {
         replyKeyboardMarkup.setResizeKeyboard(true);
         replyKeyboardMarkup.setOneTimeKeyboard(false);
         return replyKeyboardMarkup;
-    }
-
-    /**
-     * Получение фото сообщения с главным меню
-     *
-     * @param chatId  - id чата
-     * @param image   - прикрепляемое изображение
-     * @param caption - подпись к изображению
-     * @return SendPhoto с главным меню
-     */
-    public SendPhoto getMainMenuPhotoMessage(long chatId, File image, String caption) {
-        final ReplyKeyboard replyKeyboardMarkup = getMainMenuKeyboard();
-        return createPhotoMessageWithKeyboard(chatId, image, caption, replyKeyboardMarkup);
-    }
-
-    private SendPhoto createPhotoMessageWithKeyboard(long chatId, File image, String caption, ReplyKeyboard replyKeyboardMarkup) {
-        return SendPhoto.builder()
-                .photo(new InputFile(image))
-                .chatId(String.valueOf(chatId))
-                .replyMarkup(replyKeyboardMarkup)
-                .caption(caption)
-                .build();
     }
 }

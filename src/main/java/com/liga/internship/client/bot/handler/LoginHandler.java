@@ -16,8 +16,8 @@ import org.telegram.telegrambots.meta.api.objects.Message;
 import java.util.Optional;
 
 import static com.liga.internship.client.bot.BotState.*;
-import static com.liga.internship.client.commons.TextMessage.MESSAGE_MAIN_MENU;
-import static com.liga.internship.client.commons.TextMessage.MESSAGE_WELCOME;
+import static com.liga.internship.client.commons.Constant.MESSAGE_MAIN_MENU;
+import static com.liga.internship.client.commons.Constant.MESSAGE_WELCOME;
 
 /**
  * Обработчик входящих Message и CallbackQuery сообщений телеграм бота, связанных с логином пользователя.
@@ -44,6 +44,13 @@ public class LoginHandler implements InputMessageHandler, InputCallbackHandler {
         return getSendMessage(userId, chatId);
     }
 
+    @Override
+    public PartialBotApiMethod<?> handleCallback(CallbackQuery callbackQuery) {
+        long userId = callbackQuery.getFrom().getId();
+        long chatId = callbackQuery.getMessage().getChatId();
+        return getSendMessage(userId, chatId);
+    }
+
     private SendMessage getSendMessage(long userId, long chatId) {
         Optional<UserProfile> userProfile = v1RestService.userLogin(userId);
         if (userProfile.isPresent()) {
@@ -52,14 +59,7 @@ public class LoginHandler implements InputMessageHandler, InputCallbackHandler {
             return mainMenuService.getMainMenuMessage(chatId, MESSAGE_MAIN_MENU);
         } else {
             userDataCache.setUsersCurrentBotState(userId, HANDLER_PROFILE_FILLING);
-            return loginService.getMEssageWithFillFormMenu(chatId, MESSAGE_WELCOME);
+            return loginService.getMessageWithFillFormMenu(chatId, MESSAGE_WELCOME);
         }
-    }
-
-    @Override
-    public PartialBotApiMethod<?> handleCallback(CallbackQuery callbackQuery) {
-        long userId = callbackQuery.getFrom().getId();
-        long chatId = callbackQuery.getMessage().getChatId();
-        return getSendMessage(userId, chatId);
     }
 }

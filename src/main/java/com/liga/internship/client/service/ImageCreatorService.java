@@ -54,51 +54,75 @@ public class ImageCreatorService {
         return trend;
     }
 
+    private void drawLines(Rectangle rect, Graphics2D g2, float x, List<TextLayout> lines, float textHeight) {
+        float yAxis = (rect.height - textHeight) / 2;
+        for (TextLayout line : lines) {
+            line.draw(g2, x, yAxis + line.getAscent());
+            yAxis += line.getAscent() + line.getDescent() + line.getLeading();
+        }
+    }
+
+    private List<AttributedString> getAttributedStrings(String[] formatted) {
+        Font headerFont = new Font("Old Standard TT", Font.BOLD, 55);
+        Font descriptionFont = new Font("Old Standard TT", Font.PLAIN, 24);
+        List<AttributedString> attributedStrings = new ArrayList<>();
+        for (int i = 0; i < formatted.length; i++) {
+            AttributedString attributedStringLine = new AttributedString(formatted[i]);
+            if (i == 0) {
+                attributedStringLine = new AttributedString(formatted[i].toUpperCase(Locale.ROOT));
+                attributedStringLine.addAttribute(TextAttribute.FONT, headerFont);
+            } else {
+                attributedStringLine.addAttribute(TextAttribute.FONT, descriptionFont);
+            }
+            attributedStrings.add(attributedStringLine);
+        }
+        return attributedStrings;
+    }
+
+    private Graphics2D getGraphics2D(BufferedImage image) {
+        Graphics2D g2 = (Graphics2D) image.getGraphics();
+        g2.setColor(Color.BLACK);
+        return g2;
+    }
+
     private BufferedImage getImageWithText(String text) {
         String[] formatted = getTransformedTextWithNewLine(text);
         BufferedImage image = null;
         try {
             image = ImageIO.read(backgroundImageResourse.getInputStream());
-            Font headerFont = new Font("Old Standard TT", Font.BOLD, 55);
-            Font descriptionFont = new Font("Old Standard TT", Font.PLAIN, 24);
             Rectangle rect = new Rectangle(image.getWidth(), image.getHeight());
-            List<AttributedString> attributedStrings = new ArrayList<>();
-            for (int i = 0; i < formatted.length; i++) {
-                AttributedString attributedStringLine = new AttributedString(formatted[i]);
-                if (i == 0) {
-                    attributedStringLine = new AttributedString(formatted[i].toUpperCase(Locale.ROOT));
-                    attributedStringLine.addAttribute(TextAttribute.FONT, headerFont);
-                } else {
-                    attributedStringLine.addAttribute(TextAttribute.FONT, descriptionFont);
-                }
-                attributedStrings.add(attributedStringLine);
-            }
+            List<AttributedString> attributedStrings = getAttributedStrings(formatted);
             if (!attributedStrings.isEmpty()) {
-                Graphics2D g2 = (Graphics2D) image.getGraphics();
-                g2.setColor(Color.BLACK);
-                float x = 50;
-                List<TextLayout> lines = new ArrayList<>();
-                for (int i = 0; i < attributedStrings.size(); i++) {
-                    AttributedCharacterIterator iterator = attributedStrings.get(i).getIterator();
-                    LineBreakMeasurer measurer = new LineBreakMeasurer(iterator, g2.getFontRenderContext());
-                    while (measurer.getPosition() < formatted[i].length()) {
-                        lines.add(measurer.nextLayout((rect.width - x * 2)));
-                    }
-                }
+                Graphics2D g2 = getGraphics2D(image);
+                float xAxis = 50;
+                List<TextLayout> lines = getTextLayouts(formatted, rect, attributedStrings, g2, xAxis);
                 float textHeight = 0;
-                for (TextLayout line : lines) {
-                    textHeight += line.getAscent() + line.getDescent() + line.getLeading();
-                }
-                float y = (rect.height - textHeight) / 2;
-                for (TextLayout line : lines) {
-                    line.draw(g2, x, y + line.getAscent());
-                    y += line.getAscent() + line.getDescent() + line.getLeading();
-                }
+                textHeight = getTextHeight(lines, textHeight);
+                drawLines(rect, g2, xAxis, lines, textHeight);
             }
         } catch (IOException e) {
             e.printStackTrace();
         }
         return image;
+    }
+
+    private float getTextHeight(List<TextLayout> lines, float textHeight) {
+        for (TextLayout line : lines) {
+            textHeight += line.getAscent() + line.getDescent() + line.getLeading();
+        }
+        return textHeight;
+    }
+
+    private List<TextLayout> getTextLayouts(String[] formatted, Rectangle rect, List<AttributedString> attributedStrings, Graphics2D g2, float x) {
+        List<TextLayout> lines = new ArrayList<>();
+        for (int i = 0; i < attributedStrings.size(); i++) {
+            AttributedCharacterIterator iterator = attributedStrings.get(i).getIterator();
+            LineBreakMeasurer measurer = new LineBreakMeasurer(iterator, g2.getFontRenderContext());
+            while (measurer.getPosition() < formatted[i].length()) {
+                lines.add(measurer.nextLayout((rect.width - x * 2)));
+            }
+        }
+        return lines;
     }
 
     private String[] getTransformedTextWithNewLine(String text) {

@@ -3,7 +3,6 @@ package com.liga.internship.client.service;
 import com.liga.internship.client.commons.ButtonCallback;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
-import org.telegram.telegrambots.meta.api.methods.PartialBotApiMethod;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.methods.send.SendPhoto;
 import org.telegram.telegrambots.meta.api.methods.updatingmessages.EditMessageMedia;
@@ -22,46 +21,42 @@ import java.util.List;
 
 import static com.liga.internship.client.commons.ButtonInput.*;
 
+/**
+ * Сервис для FavoritesHandler, предоставляет создание ответов в виде:
+ * -текстового сообщения с reply клавиатурой
+ * -медиа сообщения с inline клавиатурой
+ * -изменяемого медиа сообщения с inline клавиатурой
+ */
 @Service
 @AllArgsConstructor
 public class FavoritesService {
-    public PartialBotApiMethod<?> getMenuInlineKeyBoardService(long chatId, File image, String caption) {
-        final InlineKeyboardMarkup replyKeyboardMarkup = getInlineOneMenuKeyboard();
-        return createPhotoMessageWithInlineKeyBoard(chatId, image, caption, replyKeyboardMarkup);
+    private final MainMenuService mainMenuService;
+
+    public SendMessage getMainMenuMessage(long chatId, String messageMainMenu) {
+        return mainMenuService.getMainMenuMessage(chatId, messageMainMenu);
     }
 
-    private SendPhoto createPhotoMessageWithInlineKeyBoard(long chatId, File image, String caption, ReplyKeyboard replyKeyboardMarkup) {
-        return SendPhoto.builder()
-                .photo(new InputFile(image))
-                .chatId(String.valueOf(chatId))
-                .replyMarkup(replyKeyboardMarkup)
-                .caption(caption)
-                .build();
-    }
-
-    private InlineKeyboardMarkup getInlineOneMenuKeyboard() {
-        final InlineKeyboardMarkup inlineKeyboardMarkup = new InlineKeyboardMarkup();
-        List<List<InlineKeyboardButton>> rowsInline = new ArrayList<>();
-        List<InlineKeyboardButton> menuRow = new ArrayList<>();
-        menuRow.add(getInlineKeyboardButton(ButtonCallback.MENU, ButtonCallback.CALLBACK_MENU));
-        rowsInline.add(menuRow);
-        inlineKeyboardMarkup.setKeyboard(rowsInline);
-        return inlineKeyboardMarkup;
-    }
-
-    private InlineKeyboardButton getInlineKeyboardButton(String buttonText, String buttonCommand) {
-        InlineKeyboardButton inlineKeyboardButton = new InlineKeyboardButton();
-        inlineKeyboardButton.setText(buttonText);
-        inlineKeyboardButton.setCallbackData(buttonCommand);
-        return inlineKeyboardButton;
-    }
-
+    /**
+     * Получение изменяемого медиа сообщения с клавиатурой Menu.
+     * **************
+     * ****message***
+     * **************
+     * -caption-
+     * [prev]  [next]
+     * [    menu    ]
+     *
+     * @param chatId    - id чата
+     * @param messageId - id изменяемого сообщение
+     * @param image     - изображение профиля
+     * @param caption   - подпись к профилю
+     * @return EditedMessageMedia - сообщение с клавиатурой next prev menu
+     */
     public EditMessageMedia getNextPrevInlineKeyboardEditedMessage(long chatId, int messageId, File image, String caption) {
-        final InlineKeyboardMarkup replyKeyboardMarkup = getInlineMenuKeyboard();
+        final InlineKeyboardMarkup replyKeyboardMarkup = getInlineNextPrevMenuKeyboard();
         return createEditedPhotoMessageWithKeyboard(chatId, messageId, image, caption, replyKeyboardMarkup);
     }
 
-    private InlineKeyboardMarkup getInlineMenuKeyboard() {
+    private InlineKeyboardMarkup getInlineNextPrevMenuKeyboard() {
         final InlineKeyboardMarkup inlineKeyboardMarkup = new InlineKeyboardMarkup();
         List<List<InlineKeyboardButton>> rowsInline = new ArrayList<>();
         List<InlineKeyboardButton> topRow = new ArrayList<>();
@@ -75,6 +70,23 @@ public class FavoritesService {
         return inlineKeyboardMarkup;
     }
 
+    private InlineKeyboardButton getInlineKeyboardButton(String buttonText, String buttonCommand) {
+        InlineKeyboardButton inlineKeyboardButton = new InlineKeyboardButton();
+        inlineKeyboardButton.setText(buttonText);
+        inlineKeyboardButton.setCallbackData(buttonCommand);
+        return inlineKeyboardButton;
+    }
+
+    /**
+     * Сборка изменяемого медиа сообщения
+     *
+     * @param chatId-             - id чата
+     * @param messageId           - id изменяемого сообщения
+     * @param image               - изображение профиля
+     * @param caption             - подпись к профилю
+     * @param replyKeyboardMarkup - прикрепляемая клавиатура
+     * @return EditMessageMedia
+     */
     private EditMessageMedia createEditedPhotoMessageWithKeyboard(long chatId, int messageId, File image, String caption, InlineKeyboardMarkup replyKeyboardMarkup) {
         InputMediaPhoto inputMediaPhoto = new InputMediaPhoto();
         inputMediaPhoto.setMedia(image, String.format("image%d.jpg", chatId));
@@ -88,11 +100,66 @@ public class FavoritesService {
     }
 
     public SendPhoto getNextPrevInlineKeyboardPhotoMessage(long chatId, File image, String caption) {
-        final InlineKeyboardMarkup replyKeyboardMarkup = getInlineMenuKeyboard();
+        final InlineKeyboardMarkup replyKeyboardMarkup = getInlineNextPrevMenuKeyboard();
+        return createPhotoMessageWithInlineKeyBoard(chatId, image, caption, replyKeyboardMarkup);
+    }
+
+    /**
+     * Сборщик фотосообщения
+     *
+     * @param chatId              - id чата
+     * @param image               - изображение профиля
+     * @param caption             - подпись к профилю
+     * @param replyKeyboardMarkup - прикрепляемая клавиатура
+     * @return SendPhoto с кастомной клавиатурой
+     */
+    private SendPhoto createPhotoMessageWithInlineKeyBoard(long chatId, File image, String caption, ReplyKeyboard replyKeyboardMarkup) {
+        return SendPhoto.builder()
+                .photo(new InputFile(image))
+                .chatId(String.valueOf(chatId))
+                .replyMarkup(replyKeyboardMarkup)
+                .caption(caption)
+                .build();
+    }
+
+    /**
+     * Получение фото сообщения с клавиатурой Menu.
+     * **************
+     * ****message***
+     * **************
+     * [    menu    ]
+     *
+     * @param chatId  - id чата
+     * @param image   - изображение профиля
+     * @param caption - подпись к профилю
+     * @return SendPhoto сообщение с клавиатурой menu
+     */
+    public SendPhoto getPhotoMessageWithInlineMenuKeyboard(long chatId, File image, String caption) {
+        final InlineKeyboardMarkup replyKeyboardMarkup = getInlineOneMenuKeyboard();
         return createPhotoMessageWithInlineKeyBoard(chatId, image, caption, replyKeyboardMarkup);
     }
 
 
+    private InlineKeyboardMarkup getInlineOneMenuKeyboard() {
+        final InlineKeyboardMarkup inlineKeyboardMarkup = new InlineKeyboardMarkup();
+        List<List<InlineKeyboardButton>> rowsInline = new ArrayList<>();
+        List<InlineKeyboardButton> menuRow = new ArrayList<>();
+        menuRow.add(getInlineKeyboardButton(ButtonCallback.MENU, ButtonCallback.CALLBACK_MENU));
+        rowsInline.add(menuRow);
+        inlineKeyboardMarkup.setKeyboard(rowsInline);
+        return inlineKeyboardMarkup;
+    }
+
+    /**
+     * Получение сообщения с главным меню хэндлера
+     * <p>
+     * [мои любимцы][я любимец][взаимность]
+     * [           главное меню           ]
+     *
+     * @param chatId  - id чата
+     * @param message - текст отправляемого сообщения
+     * @return SendMessage с главным меню
+     */
     public SendMessage getReplyFavoritesKeyboardTextMessage(long chatId, String message) {
         final ReplyKeyboard replyKeyboardMarkup = getReplyKeyboard();
         return createMessageWithFavoritesMenuKeyboard(chatId, message, replyKeyboardMarkup);
@@ -109,6 +176,11 @@ public class FavoritesService {
         return sendMessage;
     }
 
+    /**
+     * Клавиатура ReplyKeyboardMarkup главного меню в разделе любимцы
+     *
+     * @return ReplyKeyboard
+     */
     private ReplyKeyboard getReplyKeyboard() {
         final ReplyKeyboardMarkup replyKeyboardMarkup = new ReplyKeyboardMarkup();
         replyKeyboardMarkup.setSelective(true);

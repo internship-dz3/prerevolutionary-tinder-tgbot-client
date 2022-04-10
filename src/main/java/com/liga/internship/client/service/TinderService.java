@@ -3,6 +3,7 @@ package com.liga.internship.client.service;
 import com.liga.internship.client.commons.ButtonCallback;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.methods.send.SendPhoto;
 import org.telegram.telegrambots.meta.api.methods.updatingmessages.EditMessageMedia;
 import org.telegram.telegrambots.meta.api.objects.InputFile;
@@ -15,9 +16,34 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Сервис хендлера голосования предоставляет создание ответов в виде:
+ * -текстовое сообщение с главным меню
+ * -фото сообщение с клавиатурой голосования
+ * -изменяемое фотосообщение с клавиатурой голосования
+ */
 @Service
 @AllArgsConstructor
 public class TinderService {
+    private final MainMenuService mainMenuService;
+
+    /**
+     * Измененное медиа сообщение с клавиатурой голосования
+     * *******************
+     * ****** edited *****
+     * ****** image ******
+     * *******************
+     * *******************
+     * -caption-
+     * [dislike][  like  ]
+     * [    main menu    ]
+     *
+     * @param chatId    - id чата
+     * @param messageId - id изменяемого сообщщения
+     * @param image     - изображение изменяемого сообщения
+     * @param caption   - подпись к изображению
+     * @return EditMessageMedia
+     */
     public EditMessageMedia getEditedLikeDislikePhotoMessage(long chatId, int messageId, File image, String caption) {
         final InlineKeyboardMarkup replyKeyboardMarkup = getInlineMenuKeyboard();
         return createEditedPhotoMessageWithKeyboard(chatId, messageId, image, caption, replyKeyboardMarkup);
@@ -27,7 +53,6 @@ public class TinderService {
         InputMediaPhoto inputMediaPhoto = new InputMediaPhoto();
         inputMediaPhoto.setMedia(image, String.format("image%d.jpg", chatId));
         inputMediaPhoto.setCaption(caption);
-
         EditMessageMedia editMessageMedia = new EditMessageMedia();
         editMessageMedia.setMedia(inputMediaPhoto);
         editMessageMedia.setChatId(String.valueOf(chatId));
@@ -57,6 +82,21 @@ public class TinderService {
         return inlineKeyboardButton;
     }
 
+    /**
+     * Поучение графического сообщения с клавиатурой голосования
+     *
+     * *******************
+     * ****** image ******
+     * *******************
+     * -caption-
+     * [dislike][  like  ]
+     * [    main menu    ]
+     *
+     * @param chatId  - id чата
+     * @param image   - изображение изменяемого сообщения
+     * @param caption - подпись к изображению
+     * @return SendPhoto c клавиатурой голосования
+     */
     public SendPhoto getLikeDislikeMenuPhotoMessage(long chatId, File image, String caption) {
         final InlineKeyboardMarkup replyKeyboardMarkup = getInlineMenuKeyboard();
         return createPhotoMessageWithKeyboard(chatId, image, caption, replyKeyboardMarkup);
@@ -69,5 +109,16 @@ public class TinderService {
                 .replyMarkup(replyKeyboardMarkup)
                 .caption(caption)
                 .build();
+    }
+
+    /**
+     * Текстовое сообщение с главным меню
+     *
+     * @param chatId  - id чата
+     * @param message - текст сообщения
+     * @return SendMessage
+     */
+    public SendMessage getMainMenuMessage(long chatId, String message) {
+        return mainMenuService.getMainMenuMessage(chatId, message);
     }
 }

@@ -2,6 +2,7 @@ package com.liga.internship.client.cache;
 
 import com.liga.internship.client.bot.BotState;
 import com.liga.internship.client.domain.UserProfile;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
 import java.util.HashMap;
@@ -10,6 +11,7 @@ import java.util.Map;
 /**
  * Данные хранящиеся в памяти для хранения активных пользователей и хранения их состояния
  */
+@Slf4j
 @Component
 public class UserDataCache {
     private final Map<Long, BotState> userBotStates = new HashMap<>();
@@ -22,11 +24,7 @@ public class UserDataCache {
      * @return Optional.empty() если данный пользватель отсутствует в кэше
      */
     public UserProfile getUserProfile(long userId) {
-        UserProfile activeUserProfile = userProfileMap.get(userId);
-        if (activeUserProfile == null) {
-            return new UserProfile();
-        }
-        return activeUserProfile;
+        return userProfileMap.get(userId);
     }
 
     /**
@@ -37,7 +35,7 @@ public class UserDataCache {
      */
     public BotState getUsersCurrentBotState(long userId) {
         BotState botState = userBotStates.get(userId);
-        if (botState == null) {
+        if (botState == null || userProfileMap.get(userId) == null) {
             botState = BotState.HANDLER_LOGIN;
         }
         return botState;
@@ -50,6 +48,7 @@ public class UserDataCache {
      * @param userProfile - активный профиль
      */
     public void saveUserProfile(long userId, UserProfile userProfile) {
+        log.debug("save user profile userId: {}, profile: {}", userId, userProfile);
         userProfileMap.put(userId, userProfile);
     }
 
@@ -60,6 +59,7 @@ public class UserDataCache {
      * @param botState - состояние
      */
     public void setUsersCurrentBotState(long userId, BotState botState) {
+        log.debug("userId: {}, set BotState: {}", userId, botState.name());
         userBotStates.put(userId, botState);
     }
 

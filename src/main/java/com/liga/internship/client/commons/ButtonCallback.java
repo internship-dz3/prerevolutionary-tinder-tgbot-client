@@ -14,7 +14,6 @@ public class ButtonCallback {
     public static final String CALLBACK_PREV = "PREVIOUS_FAV";
     public static final String BUTTON_NEXT = "▶";
     public static final String CALLBACK_NEXT = "NEXT_FAV";
-
     public static final String CALLBACK_MALE = "MALE";
     public static final String CALLBACK_FEMALE = "FEMALE";
     public static final String CALLBACK_ALL = "ALL";

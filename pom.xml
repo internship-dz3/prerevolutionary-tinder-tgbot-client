@@ -44,7 +44,7 @@
     </dependencies>
 
     <build>
-        <finalName>prerevolutionary-tinder-tgbot-client-docker</finalName>
+        <finalName>prerevolutionary-tinder-tgbot-client</finalName>
         <resources>
             <resource>
                 <directory>src/main/resources</directory>

@@ -1,6 +1,7 @@
 package com.liga.internship.client.cache;
 
 import com.liga.internship.client.domain.UserProfile;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
 import java.util.HashMap;
@@ -11,6 +12,7 @@ import java.util.Optional;
 /**
  * Данные хранящиеся в памяти для отображения участников голосования, для соответствующего пользователя
  */
+@Slf4j
 @Component
 public class TinderDataCache {
     private final Map<Long, List<UserProfile>> listForProcess = new HashMap<>();
@@ -40,10 +42,10 @@ public class TinderDataCache {
      */
     public Optional<UserProfile> getUserFromVotingProcess(long userId) {
         UserProfile remove = usersInProcess.remove(userId);
-        if(remove == null) {
-            return  Optional.empty();
+        if (remove == null) {
+            return Optional.empty();
         } else {
-            return  Optional.of(remove);
+            return Optional.of(remove);
         }
     }
 
@@ -53,25 +55,29 @@ public class TinderDataCache {
      * @param userId - ID активного пользователя(голосующего)
      */
     public void removeProcessList(Long userId) {
+        log.debug("userId: {}, remove tinder process list", userId);
         listForProcess.remove(userId);
     }
 
     /**
      * Внесения списка голосования в кэш
      *
-     * @param userId - ID активного пользователя(голосующего)
+     * @param userId       - ID активного пользователя(голосующего)
      * @param userProfiles - список кандидатов голосования
      */
     public void setProcessDataList(Long userId, List<UserProfile> userProfiles) {
+        log.debug("userId: {}, set tinder process data list size: {}", userId, userProfiles.size());
         listForProcess.put(userId, userProfiles);
     }
 
     /**
      * Внесение в кэш кандидата голосования
-     * @param userId - ID активного пользователя(голосующего)
+     *
+     * @param userId        - ID активного пользователя(голосующего)
      * @param userInProcess - кандидат голосования
      */
     public void setUserToVotingProcess(long userId, UserProfile userInProcess) {
+        log.debug("tinder user process userId: {}, set process user: {}", userId, userInProcess);
         usersInProcess.put(userId, userInProcess);
     }
 }

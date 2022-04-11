@@ -20,7 +20,7 @@ import static com.liga.internship.client.bot.BotState.*;
 import static com.liga.internship.client.commons.ButtonCallback.CALLBACK_MALE;
 import static com.liga.internship.client.commons.ButtonInput.FEMALE;
 import static com.liga.internship.client.commons.ButtonInput.MALE;
-import static com.liga.internship.client.commons.TextMessage.*;
+import static com.liga.internship.client.commons.Constant.*;
 
 /**
  * Обработчик входящих Message сообщений телеграм бота, связанных с заполнением профиля пользователя.
@@ -50,6 +50,29 @@ public class FillProfileHandler implements InputMessageHandler {
         return processUserInput(message);
     }
 
+    private String getCaptureFromUserProfile(UserProfile userProfile) {
+        String gender = userProfile.getGender().equals(CALLBACK_MALE) ? MALE : FEMALE;
+        String username = textService.translateTextIntoSlavOld(userProfile.getUsername());
+        return String.format("%s, %s", gender, username);
+    }
+
+    private PartialBotApiMethod<?> getMessageReplyForAskName(String userAnswer, long userId, long chatId, UserProfile userProfile) {
+        PartialBotApiMethod<?> replyToUser;
+        if (userProfile.setGenderByButtonCallback(userAnswer)) {
+            replyToUser = profileService.getReplyMessage(chatId, MESSAGE_ENTER_YOUR_NAME);
+            userDataCache.setUsersCurrentBotState(userId, FILLING_PROFILE_ASK_DESCRIBE);
+        } else {
+            replyToUser = profileService.getMessageWithGenderChooseKeyboard(chatId, MESSAGE_CHOOSE_YOUR_GENDER);
+            userDataCache.setUsersCurrentBotState(userId, FILLING_PROFILE_ASK_NAME);
+        }
+        return replyToUser;
+    }
+
+    private UserProfile getRegisteredUserProfile(UserProfile userProfile) {
+        Optional<UserProfile> optionalNewUser = v1RestService.registerNewUser(userProfile);
+        return optionalNewUser.orElseThrow();
+    }
+
     private PartialBotApiMethod<?> processUserInput(Message message) {
         String userAnswer = message.getText();
         long userId = message.getFrom().getId();
@@ -73,9 +96,14 @@ public class FillProfileHandler implements InputMessageHandler {
             userDataCache.setUsersCurrentBotState(userId, FILLING_PROFILE_ASK_LOOK);
         }
         if (botState.equals(FILLING_PROFILE_ASK_LOOK)) {
-            userProfile.setDescription(userAnswer);
-            replyToUser = profileService.getMessageWithgetLookGenderChooseKeyboard(chatId, MESSAGE_LOOKFOR);
-            userDataCache.setUsersCurrentBotState(userId, FILLING_PROFILE_COMPLETE);
+            if (userAnswer.length() > MESSAGE_LENGTH) {
+                replyToUser = profileService.getReplyMessage(chatId, MESSAGE_MANY_WORDS);
+                userDataCache.setUsersCurrentBotState(userId, FILLING_PROFILE_ASK_LOOK);
+            } else {
+                userProfile.setDescription(userAnswer);
+                replyToUser = profileService.getMessageWithgetLookGenderChooseKeyboard(chatId, MESSAGE_LOOKFOR);
+                userDataCache.setUsersCurrentBotState(userId, FILLING_PROFILE_COMPLETE);
+            }
         }
         if (botState.equals(FILLING_PROFILE_COMPLETE)) {
             if (userProfile.setLookByButtonCallback(userAnswer)) {
@@ -88,30 +116,8 @@ public class FillProfileHandler implements InputMessageHandler {
                 userDataCache.setUsersCurrentBotState(userId, FILLING_PROFILE_COMPLETE);
             }
         }
+        log.info("Filling user profile {}", userProfile);
         userDataCache.saveUserProfile(userId, userProfile);
         return replyToUser;
-    }
-
-    private PartialBotApiMethod<?> getMessageReplyForAskName(String userAnswer, long userId, long chatId, UserProfile userProfile) {
-        PartialBotApiMethod<?> replyToUser;
-        if (userProfile.setGenderByButtonCallback(userAnswer)) {
-            replyToUser = profileService.getReplyMessage(chatId, MESSAGE_ENTER_YOUR_NAME);
-            userDataCache.setUsersCurrentBotState(userId, FILLING_PROFILE_ASK_DESCRIBE);
-        } else {
-            replyToUser = profileService.getMessageWithGenderChooseKeyboard(chatId, MESSAGE_CHOOSE_YOUR_GENDER);
-            userDataCache.setUsersCurrentBotState(userId, FILLING_PROFILE_ASK_NAME);
-        }
-        return replyToUser;
-    }
-
-    private UserProfile getRegisteredUserProfile(UserProfile userProfile) {
-        Optional<UserProfile> optionalNewUser = v1RestService.registerNewUser(userProfile);
-         return optionalNewUser.orElseThrow();
-    }
-
-    private String getCaptureFromUserProfile(UserProfile userProfile) {
-        String gender = userProfile.getGender().equals(CALLBACK_MALE) ? MALE : FEMALE;
-        String username = textService.translateTextIntoSlavOld(userProfile.getUsername());
-        return String.format("%s, %s", gender, username);
     }
 }

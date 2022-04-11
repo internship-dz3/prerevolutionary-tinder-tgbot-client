@@ -14,7 +14,6 @@ import static com.liga.internship.client.commons.ButtonInput.*;
 public class UserProfile {
     private Long telegramId;
     private String username;
-    private Integer age = 20;
     private String description;
     private String gender;
     private String look;

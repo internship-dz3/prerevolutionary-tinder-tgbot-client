@@ -3,6 +3,7 @@ package com.liga.internship.client.service;
 import com.liga.internship.client.domain.UserProfile;
 import com.liga.internship.client.domain.dto.UsersIdTo;
 import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.reactive.function.client.WebClientResponseException;
@@ -19,6 +20,7 @@ import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
  * Сервис веб-клиента
  * Версия API 1
  */
+@Slf4j
 @Service
 @AllArgsConstructor
 public class V1RestService {
@@ -31,6 +33,7 @@ public class V1RestService {
      * @return список поклонников
      */
     public List<UserProfile> getAdmirerList(long id) {
+        log.debug("getAdmirerList id: {}", id);
         return webClient.get()
                 .uri(uriBuilder -> uriBuilder.path(GET_ADMIRER_LIST)
                         .build(id))
@@ -47,6 +50,7 @@ public class V1RestService {
      * @return список любимцев
      */
     public List<UserProfile> getFavoritesList(long id) {
+        log.debug("getFavoritesList id: {}", id);
         return webClient.get()
                 .uri(uriBuilder -> uriBuilder.path(GET_FAVORITE_LIST)
                         .build(id))
@@ -63,6 +67,7 @@ public class V1RestService {
      * @return список взаимностей
      */
     public List<UserProfile> getLoveList(long id) {
+        log.debug("getLoveList id: {}", id);
         return webClient.get()
                 .uri(uriBuilder -> uriBuilder.path(GET_LOVE_LIST)
                         .build(id))
@@ -79,6 +84,7 @@ public class V1RestService {
      * @return список поклонников
      */
     public List<UserProfile> getNotRatedUsers(Long id) {
+        log.debug("getNotRatedUsers id: {}", id);
         return webClient.get()
                 .uri(uriBuilder -> uriBuilder.path(GET_NOT_RATED_LIST)
                         .build(id))
@@ -96,6 +102,7 @@ public class V1RestService {
      * @return опционального пользователя при успешной регистрации или Optional.empty() при ошибке
      */
     public Optional<UserProfile> registerNewUser(UserProfile userProfile) {
+        log.debug("registerNewUser userProfile: {}", userProfile);
         return webClient.post()
                 .uri(uriBuilder -> uriBuilder.path(POST_REGISTER_NEW_USER)
                         .build())
@@ -114,6 +121,7 @@ public class V1RestService {
      * @param usersIdTo - дто айдишников
      */
     public void sendDislikeRequest(UsersIdTo usersIdTo) {
+        log.debug("sendDislikeRequest usersIdTo: {}", usersIdTo);
         webClient.post()
                 .uri(uriBuilder -> uriBuilder.path(POST_DISLIKE)
                         .build())
@@ -130,6 +138,7 @@ public class V1RestService {
      * @param usersIdTo - дто айдишников
      */
     public boolean sendLikeRequest(UsersIdTo usersIdTo) {
+        log.debug("sendLikeRequest usersIdTo: {}", usersIdTo);
         return Boolean.TRUE.equals(webClient.post()
                 .uri(uriBuilder -> uriBuilder.path(POST_LIKE)
                         .build())
@@ -141,11 +150,12 @@ public class V1RestService {
     }
 
     /**
-     * Обновление существующего пользователя
+     * Обновление активного существующего пользователя
      *
      * @param userProfile - профиль существующего профиля
      */
     public void updateUser(UserProfile userProfile) {
+        log.debug("updateUser userProfile: {}", userProfile);
         webClient.put()
                 .uri(uriBuilder -> uriBuilder.path(PUT_UPDATE_USER)
                         .build())
@@ -163,6 +173,7 @@ public class V1RestService {
      * @return Опционального пользователя при успешном логине
      */
     public Optional<UserProfile> userLogin(long id) {
+        log.debug("userLogin id: {}", id);
         return webClient.post()
                 .uri(uriBuilder -> uriBuilder.path(LOGIN)
                         .build())

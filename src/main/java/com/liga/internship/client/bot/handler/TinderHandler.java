@@ -80,8 +80,10 @@ public class TinderHandler implements InputMessageHandler, InputCallbackHandler 
         long chatId = callbackQuery.getMessage().getChatId();
         int messageId = callbackQuery.getMessage().getMessageId();
         UserProfile currentUser = userDataCache.getUserProfile(userId);
+        log.info("handleCallback userID: {}, chatID: {}, CallBackData: {}", userId, chatId, callbackQueryData);
         if (callbackQueryData.equals(CALLBACK_MENU)) {
             userDataCache.setUsersCurrentBotState(userId, HANDLER_MAIN_MENU);
+            tinderDataCache.removeProcessList(userId);
             return tinderService.getMainMenuMessage(chatId, MESSAGE_MAIN_MENU);
         }
         processVotingCallbackQuery(callbackQuery, callbackQueryData, userId, currentUser);
@@ -110,6 +112,7 @@ public class TinderHandler implements InputMessageHandler, InputCallbackHandler 
     }
 
     private void processVotingCallbackQuery(CallbackQuery callbackQuery, String callbackQueryData, long userId, UserProfile currentUser) {
+        log.info("processVotingCallbackQuery userID: {}, callbackQueryData: {}", userId, callbackQuery);
         if (callbackQueryData.equals(CALLBACK_LIKE)) {
             Optional<UserProfile> favoriteUser = tinderDataCache.getUserFromVotingProcess(userId);
             if (favoriteUser.isPresent()) {
@@ -120,7 +123,6 @@ public class TinderHandler implements InputMessageHandler, InputCallbackHandler 
                 }
             }
         }
-
         if (callbackQueryData.equals(CALLBACK_DISLIKE)) {
             Optional<UserProfile> favoriteUser = tinderDataCache.getUserFromVotingProcess(userId);
             favoriteUser.ifPresent(userProfile -> v1RestService.sendDislikeRequest(new UsersIdTo(currentUser.getTelegramId(), userProfile.getTelegramId())));
@@ -130,6 +132,7 @@ public class TinderHandler implements InputMessageHandler, InputCallbackHandler 
     private PartialBotApiMethod<?> startVoting(long userId, long chatId) {
         List<UserProfile> notRatedUsers = v1RestService.getNotRatedUsers(userId);
         PartialBotApiMethod<?> userReply;
+        log.info("startVoting userID: {}, chatID: {}, notRated users size: {}", userId, chatId, notRatedUsers.size());
         if (notRatedUsers.isEmpty()) {
             tinderDataCache.removeProcessList(userId);
             return tinderService.getMainMenuMessage(chatId, MESSAGE_COMEBACK_LATER);

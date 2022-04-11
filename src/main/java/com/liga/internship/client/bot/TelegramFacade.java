@@ -33,6 +33,7 @@ public class TelegramFacade {
     }
 
     private BotState getBotState(String inputMsg, long userId) {
+        log.info("userId: {}, input message: {}", userId, inputMsg);
         BotState botState;
         switch (inputMsg) {
             case START:

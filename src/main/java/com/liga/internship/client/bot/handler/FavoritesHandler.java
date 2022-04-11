@@ -9,6 +9,7 @@ import com.liga.internship.client.service.ImageCreatorService;
 import com.liga.internship.client.service.TextService;
 import com.liga.internship.client.service.V1RestService;
 import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.telegram.telegrambots.meta.api.methods.PartialBotApiMethod;
 import org.telegram.telegrambots.meta.api.methods.send.SendPhoto;
@@ -28,6 +29,7 @@ import static com.liga.internship.client.commons.Constant.*;
  * Обработчик входящих Message и CallbackQuery сообщений телеграм бота, связанных с просмотром страниц Любимцев.
  * Обработчик хранит состояние просматриваемых данных.
  */
+@Slf4j
 @Service
 @AllArgsConstructor
 public class FavoritesHandler implements InputCallbackHandler, InputMessageHandler {
@@ -79,6 +81,7 @@ public class FavoritesHandler implements InputCallbackHandler, InputMessageHandl
             userDataCache.setUsersCurrentBotState(userId, HANDLER_MAIN_MENU);
             replyMessage = favoritesService.getMainMenuMessage(chatId, MESSAGE_MAIN_MENU);
         }
+        log.info("FavoritesHandler handleCallback: userID: {}, lastAction: {}", userId, callbackData);
         return replyMessage;
     }
 
@@ -87,16 +90,16 @@ public class FavoritesHandler implements InputCallbackHandler, InputMessageHandl
         String userButtonInput = message.getText();
         long userId = message.getFrom().getId();
         long chatId = message.getChatId();
+        log.info("FavoritesHandler handleCallback: userId: {}, chatId: {}, message: {}", userId, chatId, userButtonInput);
         if (userButtonInput.equals(FAVORITES)) {
             userDataCache.setUsersCurrentBotState(userId, HANDLER_SHOW_FAVORITES);
             return favoritesService.getReplyFavoritesKeyboardTextMessage(chatId, MESSAGE_FAVORITE);
         }
-
         List<UserProfile> favoritesList = getFavoriteList(userButtonInput, userId);
+        log.info("userId: {}, favoriteList size: {}", userId, favoritesList.size());
         if (favoritesList.isEmpty()) {
             return favoritesService.getReplyFavoritesKeyboardTextMessage(chatId, MESSAGE_EMPTY);
         }
-
         return getReplyMessage(userId, chatId, favoritesList);
     }
 
@@ -114,6 +117,7 @@ public class FavoritesHandler implements InputCallbackHandler, InputMessageHandl
     }
 
     private List<UserProfile> getFavoriteList(String userButtonInput, long userId) {
+        log.info("FavoritesHandler getFavoriteList userID: {}, favoriteListRequest: {}", userId, userButtonInput);
         switch (userButtonInput) {
             case FAVORITE:
                 favoritesDataCache.setFavoriteSearchStatus(userId, CAPTION_FAVORITE);

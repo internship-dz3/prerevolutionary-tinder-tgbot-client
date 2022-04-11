@@ -11,6 +11,7 @@ import lombok.*;
 @Setter
 @Getter
 @Builder
+@ToString
 public class UsersIdTo {
     private Long currentUserId;
     private Long processUserId;

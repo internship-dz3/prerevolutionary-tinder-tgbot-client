@@ -1,5 +1,6 @@
 package com.liga.internship.client.bot;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
@@ -16,6 +17,7 @@ import java.io.Serializable;
 /**
  * Основной бин телеграм бота
  */
+@Slf4j
 @Component
 public class TinderTelegramBot extends TelegramLongPollingBot {
     private final TelegramFacade telegramFacade;
@@ -53,7 +55,7 @@ public class TinderTelegramBot extends TelegramLongPollingBot {
             }
 
         } catch (TelegramApiException e) {
-            e.printStackTrace();
+            log.error("onUpdateReceived error", e);
         }
     }
 
@@ -63,7 +65,7 @@ public class TinderTelegramBot extends TelegramLongPollingBot {
             answerCallbackQuery.setText(alertMessage);
             execute(answerCallbackQuery);
         } catch (TelegramApiException e) {
-            e.printStackTrace();
+            log.error("sendNotificationAlert error", e);
         }
     }
 }

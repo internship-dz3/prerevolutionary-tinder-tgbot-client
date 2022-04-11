@@ -1,6 +1,7 @@
 package com.liga.internship.client.cache;
 
 import com.liga.internship.client.domain.UserProfile;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
 import java.util.HashMap;
@@ -10,6 +11,7 @@ import java.util.Map;
 /**
  * Данные хранящиеся в памяти для отображения любимцев, соответствующего пользователя
  */
+@Slf4j
 @Component
 public class FavoritesDataCache {
     private final Map<Long, List<UserProfile>> userFavorites = new HashMap<>();
@@ -69,6 +71,7 @@ public class FavoritesDataCache {
      * @param userProfiles - список любимцев
      */
     public void setProcessDataList(Long userId, List<UserProfile> userProfiles) {
+        log.info("FavoritesDataCache setProcessDataList: userId: {}, favorites list size: {}", userId, userProfiles.size());
         userFavorites.put(userId, userProfiles);
     }
 }

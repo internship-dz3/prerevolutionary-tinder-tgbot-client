@@ -116,6 +116,7 @@ public class FillProfileHandler implements InputMessageHandler {
                 userDataCache.setUsersCurrentBotState(userId, FILLING_PROFILE_COMPLETE);
             }
         }
+        log.info("Filling user profile {}", userProfile);
         userDataCache.saveUserProfile(userId, userProfile);
         return replyToUser;
     }

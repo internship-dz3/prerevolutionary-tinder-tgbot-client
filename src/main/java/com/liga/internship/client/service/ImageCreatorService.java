@@ -1,6 +1,7 @@
 package com.liga.internship.client.service;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Service;
@@ -24,6 +25,7 @@ import java.util.Locale;
 /**
  * Сервис создания изображения профиля пользователя, с указанным переведенным текстом
  */
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class ImageCreatorService {
@@ -48,8 +50,9 @@ public class ImageCreatorService {
             Files.createDirectories(tempUserImagesFolderPath);
             trend = new File(String.format("%s/image%d.jpg", tempUserImagesFolderPath.toString(), userId));
             ImageIO.write(bufferedImage, "jpg", trend);
+            log.debug("getImageWithTextFile image created");
         } catch (IOException e) {
-            e.printStackTrace();
+            log.error("getImageWithTextFile error", e);
         }
         return trend;
     }
@@ -101,7 +104,7 @@ public class ImageCreatorService {
                 drawLines(rect, g2, xAxis, lines, textHeight);
             }
         } catch (IOException e) {
-            e.printStackTrace();
+            log.error("getImageWithText error", e);
         }
         return image;
     }

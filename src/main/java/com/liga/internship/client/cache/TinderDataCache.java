@@ -1,6 +1,7 @@
 package com.liga.internship.client.cache;
 
 import com.liga.internship.client.domain.UserProfile;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
 import java.util.HashMap;
@@ -11,6 +12,7 @@ import java.util.Optional;
 /**
  * Данные хранящиеся в памяти для отображения участников голосования, для соответствующего пользователя
  */
+@Slf4j
 @Component
 public class TinderDataCache {
     private final Map<Long, List<UserProfile>> listForProcess = new HashMap<>();
@@ -53,6 +55,7 @@ public class TinderDataCache {
      * @param userId - ID активного пользователя(голосующего)
      */
     public void removeProcessList(Long userId) {
+        log.debug("userId: {}, remove tinder process list", userId);
         listForProcess.remove(userId);
     }
 
@@ -63,6 +66,7 @@ public class TinderDataCache {
      * @param userProfiles - список кандидатов голосования
      */
     public void setProcessDataList(Long userId, List<UserProfile> userProfiles) {
+        log.debug("userId: {}, set tinder process data list size: {}", userId, userProfiles.size());
         listForProcess.put(userId, userProfiles);
     }
 
@@ -73,6 +77,7 @@ public class TinderDataCache {
      * @param userInProcess - кандидат голосования
      */
     public void setUserToVotingProcess(long userId, UserProfile userInProcess) {
+        log.debug("tinder user process userId: {}, set process user: {}", userId, userInProcess);
         usersInProcess.put(userId, userInProcess);
     }
 }

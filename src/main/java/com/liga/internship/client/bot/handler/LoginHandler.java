@@ -7,6 +7,7 @@ import com.liga.internship.client.service.LoginService;
 import com.liga.internship.client.service.MainMenuService;
 import com.liga.internship.client.service.V1RestService;
 import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.meta.api.methods.PartialBotApiMethod;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
@@ -24,6 +25,7 @@ import static com.liga.internship.client.commons.Constant.MESSAGE_WELCOME;
  * Если пользователя нет на сервере, создается новый пользователь.
  * Обработчик хранит состояние просматриваемых данных.
  */
+@Slf4j
 @Component
 @AllArgsConstructor
 public class LoginHandler implements InputMessageHandler, InputCallbackHandler {
@@ -54,10 +56,13 @@ public class LoginHandler implements InputMessageHandler, InputCallbackHandler {
     private SendMessage getSendMessage(long userId, long chatId) {
         Optional<UserProfile> userProfile = v1RestService.userLogin(userId);
         if (userProfile.isPresent()) {
+            log.info("loged in successfuly user: {}", userProfile.get());
             userDataCache.saveUserProfile(userId, userProfile.get());
             userDataCache.setUsersCurrentBotState(userId, HANDLER_MAIN_MENU);
             return mainMenuService.getMainMenuMessage(chatId, MESSAGE_MAIN_MENU);
         } else {
+            log.info("loged in wrong userID: {}", userId);
+            userDataCache.saveUserProfile(userId, new UserProfile());
             userDataCache.setUsersCurrentBotState(userId, HANDLER_PROFILE_FILLING);
             return loginService.getMessageWithFillFormMenu(chatId, MESSAGE_WELCOME);
         }
